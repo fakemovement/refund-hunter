@@ -1,0 +1,17 @@
+{
+  "targets": {
+    "default": {
+      "resources": {
+        "runtimes": {
+          "Hunter": {
+            "runtimeId": "RefundHunter_Hunter-oqOSoT2Bxg",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:253184024603:runtime/RefundHunter_Hunter-oqOSoT2Bxg",
+            "roleArn": "arn:aws:iam::253184024603:role/AgentCore-RefundHunter-de-ApplicationAgentHunterRun-J1EcgpAGaFkj"
+          }
+        },
+        "stackName": "AgentCore-RefundHunter-default",
+        "deployHash": "48ec7cbf143b493c"
+      }
+    }
+  }
+}

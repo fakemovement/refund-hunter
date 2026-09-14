@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 
 import boto3
 
@@ -68,13 +69,21 @@ def upsert(runtime_arn: str, expression: str, state: str) -> None:
         State=state,
         Description="Refund Hunter: read receipts, find refunds, ask for a yes, file claims.",
     )
-    try:
-        scheduler.get_schedule(Name=NAME)
-        scheduler.update_schedule(**kwargs)
-        print(f"updated schedule {NAME} ({state})")
-    except scheduler.exceptions.ResourceNotFoundException:
-        scheduler.create_schedule(**kwargs)
-        print(f"created schedule {NAME} ({state})")
+    # A role created seconds ago is not always visible to Scheduler yet; retry briefly.
+    for attempt in range(8):
+        try:
+            try:
+                scheduler.get_schedule(Name=NAME)
+                scheduler.update_schedule(**kwargs)
+                print(f"updated schedule {NAME} ({state})")
+            except scheduler.exceptions.ResourceNotFoundException:
+                scheduler.create_schedule(**kwargs)
+                print(f"created schedule {NAME} ({state})")
+            return
+        except scheduler.exceptions.ValidationException as e:
+            if "assume the role" not in str(e) or attempt == 7:
+                raise
+            time.sleep(5)
 
 
 if __name__ == "__main__":
