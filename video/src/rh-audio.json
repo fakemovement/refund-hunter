@@ -1,0 +1,77 @@
+{
+  "total": 83.6,
+  "scenes": [
+    {
+      "id": "hook",
+      "voice": 5.52,
+      "dur": 6.22,
+      "audio": "rh/voice/hook.mp3"
+    },
+    {
+      "id": "example",
+      "voice": 7.84,
+      "dur": 8.54,
+      "audio": "rh/voice/example.mp3"
+    },
+    {
+      "id": "chore",
+      "voice": 6.48,
+      "dur": 7.18,
+      "audio": "rh/voice/chore.mp3"
+    },
+    {
+      "id": "meet",
+      "voice": 4.8,
+      "dur": 5.5,
+      "audio": "rh/voice/meet.mp3"
+    },
+    {
+      "id": "flow",
+      "voice": 5.6,
+      "dur": 6.3,
+      "audio": "rh/voice/flow.mp3"
+    },
+    {
+      "id": "run",
+      "voice": 6.16,
+      "dur": 6.86,
+      "audio": "rh/voice/run.mp3"
+    },
+    {
+      "id": "ask",
+      "voice": 6.64,
+      "dur": 7.34,
+      "audio": "rh/voice/ask.mp3"
+    },
+    {
+      "id": "approve",
+      "voice": 6.72,
+      "dur": 7.42,
+      "audio": "rh/voice/approve.mp3"
+    },
+    {
+      "id": "interrupt",
+      "voice": 8.64,
+      "dur": 9.34,
+      "audio": "rh/voice/interrupt.mp3"
+    },
+    {
+      "id": "settings",
+      "voice": 5.68,
+      "dur": 6.38,
+      "audio": "rh/voice/settings.mp3"
+    },
+    {
+      "id": "aws",
+      "voice": 6.4,
+      "dur": 7.1,
+      "audio": "rh/voice/aws.mp3"
+    },
+    {
+      "id": "close",
+      "voice": 4.72,
+      "dur": 5.42,
+      "audio": "rh/voice/close.mp3"
+    }
+  ]
+}

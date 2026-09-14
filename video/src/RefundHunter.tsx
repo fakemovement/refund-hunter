@@ -9,11 +9,12 @@
 
 import React from 'react';
 import {
-  AbsoluteFill, Easing, Img, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig,
+  AbsoluteFill, Audio, Easing, Img, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig,
 } from 'remotion';
 import { loadFont as loadFraunces } from '@remotion/google-fonts/Fraunces';
 import { loadFont as loadInter } from '@remotion/google-fonts/Inter';
 import { loadFont as loadCourier } from '@remotion/google-fonts/CourierPrime';
+import rhAudio from './rh-audio.json';
 
 const { fontFamily: FRAUNCES } = loadFraunces();
 const { fontFamily: INTER } = loadInter();
@@ -181,11 +182,13 @@ const SlamWord: React.FC<{ text: string; startF: number; y?: number; hold?: numb
 
 // ── captions ─────────────────────────────────────────────────────────────────
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-const Caption: React.FC<{ text: string; hl?: string; size?: number }> = ({ text, hl = '', size = 52 }) => {
+const Caption: React.FC<{ text: string; hl?: string; size?: number; voice?: number }> = ({ text, hl = '', size = 52, voice }) => {
   const frame = useCurrentFrame();
   const words = text.split(/\s+/).filter(Boolean);
   const hlSet = new Set(hl.split(/\s+/).map(norm).filter(Boolean));
-  const per = FPS / WORDS_PER_SEC;
+  // When a scene has a voice clip, spread the words across it (finishing a touch
+  // early) so the captions track the spoken words. Otherwise fall back to a rate.
+  const per = voice ? (voice * 0.9 * FPS) / Math.max(1, words.length) : FPS / WORDS_PER_SEC;
   return (
     <div style={{
       position: 'absolute', left: 140, right: 140, top: CAPTION_TOP, height: 150,
@@ -364,25 +367,29 @@ const PhotoTag: React.FC = () => {
   );
 };
 
-// ── the scene list (self-timed) ──────────────────────────────────────────────
-type Scene = { id: SceneId; dur: number; caption: string; hl?: string };
-const SCENES: Scene[] = [
-  { id: 'hook',      dur: 7.0,  caption: "Target, Costco, Amazon — they all owe refunds. Price drops, late deliveries, missed guarantees.", hl: "refunds" },
-  { id: 'example',   dur: 8.0,  caption: "You buy an air fryer for 129 dollars. Nine days later it drops to 108. Target's own rule says you get the 22 back.", hl: "22 back" },
-  { id: 'chore',     dur: 8.5,  caption: "But you'd have to notice, look up the rule, find the order number, write the email, and chase the reply. So nobody does.", hl: "nobody" },
-  { id: 'meet',      dur: 6.5,  caption: "Refund Hunter is an agent that does all of it for you. It's for anyone who shops online.", hl: "agent" },
-  { id: 'flow',      dur: 8.0,  caption: "Every day it reads your receipts, checks each store's rules and today's prices, and when it finds money, it asks you.", hl: "asks you" },
-  { id: 'run',       dur: 8.0,  caption: "Here it is. One press reads a dozen receipts and checks every store — Best Buy's too late, Walmart was on time.", hl: "One press" },
-  { id: 'ask',       dur: 8.5,  caption: "It found four refunds worth almost 90 dollars. It sent nothing. It asks you one plain question for each.", hl: "four refunds" },
-  { id: 'approve',   dur: 8.5,  caption: "Tap yes, and it writes the claim with the order number and the store's rule, then sends it. Tap skip, and nothing happens.", hl: "yes skip" },
-  { id: 'interrupt', dur: 8.0,  caption: "That pause is the whole idea. The agent stops mid-task and waits for you — for hours or days — then picks up exactly where it left off.", hl: "waits for you" },
-  { id: 'settings',  dur: 8.0,  caption: "Bring your own Claude or ChatGPT key, connect your Gmail, and it can email you the moment something needs a yes.", hl: "email you" },
-  { id: 'aws',       dur: 8.0,  caption: "Under the hood: two agents on the Strands SDK, running on Amazon Bedrock AgentCore, woken every morning on their own.", hl: "Strands AgentCore" },
-  { id: 'close',     dur: 8.0,  caption: "Refund Hunter. It collects the small money you're owed, and only talks to you when it needs a yes.", hl: "needs a yes" },
-];
+// ── the scene list ───────────────────────────────────────────────────────────
+// Captions + visuals live here; durations and the voice clip come from
+// rh-audio.json (one ElevenLabs take per scene), so the video always fits the
+// narration exactly.
+type Scene = { id: SceneId; caption: string; hl?: string; dur: number; voice: number; audio: string };
+const CAPTIONS: Record<SceneId, { caption: string; hl?: string }> = {
+  hook:      { caption: "Target, Costco, Amazon — they all owe refunds. Price drops, late deliveries, missed guarantees.", hl: "refunds" },
+  example:   { caption: "You buy an air fryer for $129. Nine days later it drops to $108. Target's own rule says you get the $22 back.", hl: "$22 back" },
+  chore:     { caption: "But you'd have to notice, look up the rule, find the order number, write the email, and chase the reply. So nobody does.", hl: "nobody" },
+  meet:      { caption: "Refund Hunter is an agent that does all of it for you. It's for anyone who shops online.", hl: "agent" },
+  flow:      { caption: "Every day it reads your receipts, checks each store's rules and today's prices, and when it finds money, it asks you.", hl: "asks you" },
+  run:       { caption: "Here it is. One press reads a dozen receipts and checks every store. Best Buy's too late; Walmart was on time.", hl: "One press" },
+  ask:       { caption: "It found four refunds worth almost $90. It sent nothing. It asks you one plain question for each.", hl: "four refunds" },
+  approve:   { caption: "Tap yes, and it writes the claim with the order number and the store's rule, then sends it. Tap skip, and nothing happens.", hl: "yes skip" },
+  interrupt: { caption: "That pause is the whole idea. The agent stops mid-task and waits for you, for hours or days, then picks up where it left off.", hl: "waits for you" },
+  settings:  { caption: "Bring your own Claude or ChatGPT key, connect your Gmail, and it can email you the moment something needs a yes.", hl: "email you" },
+  aws:       { caption: "Under the hood: two agents on the Strands SDK, running on Amazon Bedrock AgentCore, woken every morning on their own.", hl: "Strands AgentCore" },
+  close:     { caption: "Refund Hunter. It collects the small money you're owed, and only talks to you when it needs a yes.", hl: "needs a yes" },
+};
+const SCENES: Scene[] = (rhAudio.scenes as { id: SceneId; dur: number; voice: number; audio: string }[])
+  .map((a) => ({ id: a.id, dur: a.dur, voice: a.voice, audio: a.audio, ...CAPTIONS[a.id] }));
 
-const LEAD = 0.0;
-export const RH_TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
+export const RH_TOTAL = rhAudio.total;
 
 const SceneFade: React.FC<{ dur: number; children: React.ReactNode }> = ({ dur, children }) => {
   const f = useCurrentFrame();
@@ -422,9 +429,10 @@ export const RefundHunter: React.FC = () => {
       <AbsoluteFill style={{ transform: `scale(${camScale})`, transformOrigin: '960px 480px' }}>
         {bounds.map((b) => (
           <Sequence key={b.scene.id} from={Math.round(b.start * fps)} durationInFrames={Math.round(b.dur * fps) + 2} layout="none">
+            <Audio src={staticFile(b.scene.audio)} />
             <SceneFade dur={b.dur}>
               <Visual id={b.scene.id} />
-              <Caption text={b.scene.caption} hl={b.scene.hl} />
+              <Caption text={b.scene.caption} hl={b.scene.hl} voice={b.scene.voice} />
             </SceneFade>
           </Sequence>
         ))}
