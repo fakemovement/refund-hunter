@@ -61,6 +61,7 @@ async def run_daily(user_id: str = "local", trigger: str = "manual") -> RunRepor
     state.runs.insert(0, report)
     state.runs = state.runs[:30]
     state.updated_at = datetime.now(UTC)
+    state.running_since = None
     store.save(state)
     return report
 
@@ -205,15 +206,4 @@ def _followups(state: State, log: list[str]) -> int:
         sent += 1
     return sent
 
-
-def resolve_claim(claim_id: str, outcome: str, user_id: str = "local") -> None:
-    """The person tells us a store answered (refund received / refused)."""
-    store = get_store()
-    state = store.load(user_id)
-    c = state.claim(claim_id)
-    if not c:
-        raise KeyError(claim_id)
-    c.status = ClaimStatus.resolved
-    c.resolved_at = datetime.now(UTC)
-    c.outcome = outcome
-    store.save(state)
+from .claims import resolve_claim  # noqa: E402,F401  (kept for the CLI/API import path)

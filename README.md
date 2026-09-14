@@ -17,6 +17,10 @@ follows up if the store goes quiet. If there is nothing to claim, you never hear
 > Built for the [AWS Agents for Humans Hackathon](https://agentsforhumans.devpost.com/), track
 > **Everyday Agents**, with the [Strands Agents SDK](https://strandsagents.com/) on Amazon Bedrock
 > AgentCore.
+>
+> **Try it:** https://nj9f6ojm51.execute-api.us-east-1.amazonaws.com/ — a live dashboard
+> wired to the deployed AgentCore runtime. Press *Run today's check*, then answer the questions.
+> The inbox is synthetic and claim emails stay in the outbox, so nothing you do there reaches a real store.
 
 ![dashboard](docs/dashboard.png)
 
@@ -66,7 +70,7 @@ inbox ──► Receipt Reader ──► purchases ──► Hunter ──► cl
 | Schedule | **EventBridge Scheduler** `refundhunter-daily`, once a day, universal target `bedrockagentcore:invokeAgentRuntime` |
 | Secrets | SSM Parameter Store `/refundhunter/env` |
 | Observability | CloudWatch logs, AgentCore traces |
-| Dashboard | FastAPI + one HTML page (`refundhunter serve`), local or pointing at the runtime |
+| Dashboard | FastAPI + one HTML page (`refundhunter serve`), local or pointing at the runtime; the public demo runs it on **AWS Lambda** with a function URL (`infra/deploy_web.py`) |
 
 ## Quick start (five minutes, no accounts needed)
 

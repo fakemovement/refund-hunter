@@ -99,6 +99,9 @@ function setBusy(on, text){ busy = on; $('#run').disabled = on; $('#reset').disa
 async function load(){
   const s = await (await fetch('/api/state')).json();
   $('#owner').textContent = s.owner + ' · ' + (s.mode === 'agentcore' ? 'AgentCore runtime' : 'local agent') + ' · ' + (s.smtp ? 'email on' : 'dry-run outbox');
+  // On the public demo the reset button is hidden unless the URL ends with #admin.
+  $('#reset').hidden = (s.mode === 'agentcore' && location.hash !== '#admin');
+  if (s.running && !busy) { setBusy(true, 'The agent is running…'); waitForRun().then(m => { setBusy(false, m); load(); }); }
   $('#t-found').textContent = money(s.totals.found);
   $('#t-filed').textContent = money(s.totals.filed);
   $('#t-waiting').textContent = s.totals.waiting;
@@ -144,7 +147,16 @@ async function load(){
 
 async function post(url, body){ const r = await fetch(url, {method:'POST', headers:{'content-type':'application/json'}, body: body?JSON.stringify(body):null}); if(!r.ok){ throw new Error(await r.text()); } return r.json(); }
 
-$('#run').onclick = async () => { if(busy) return; setBusy(true,'Reading mail and checking stores…'); try{ const r = await post('/api/run'); setBusy(false, r.summary||'Done'); }catch(e){ setBusy(false,'Error: '+e.message); } load(); };
+async function waitForRun(){
+  // Hosted mode: the run happens in the background; poll until the state says it finished.
+  for (let i = 0; i < 60; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    const s = await (await fetch('/api/state')).json();
+    if (!s.running) return s.runs[0] ? s.runs[0].summary : 'Done';
+  }
+  return 'Still running, refresh in a moment';
+}
+$('#run').onclick = async () => { if(busy) return; setBusy(true,'Reading mail and checking stores…'); try{ const r = await post('/api/run'); const msg = r.started ? await waitForRun() : (r.already_running ? await waitForRun() : (r.summary||'Done')); setBusy(false, msg); }catch(e){ setBusy(false,'Error: '+e.message); } load(); };
 $('#reset').onclick = async () => { if(busy) return; if(!confirm('Wipe the demo state?')) return; await post('/api/reset'); setBusy(false,'Reset'); load(); };
 window.decide = async (id, answer) => { if(busy) return; setBusy(true, answer==='approve'?'Filing the claim…':'Skipping…'); try{ const r = await post('/api/decide',{interrupt_id:id, answer}); setBusy(false, r.summary||'Done'); }catch(e){ setBusy(false,'Error: '+e.message); } load(); };
 window.resolve = async (id, outcome) => { await post('/api/resolve',{claim_id:id, outcome}); load(); };

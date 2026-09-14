@@ -56,6 +56,7 @@ def _view(state: State) -> dict:
         "mode": "agentcore" if settings.agent_runtime_arn else "local",
         "mail_source": settings.mail_source,
         "smtp": settings.smtp_ready,
+        "running": state.is_running(),
         "purchases": [p.model_dump(mode="json") for p in sorted(state.purchases, key=lambda p: p.order_date, reverse=True)],
         "claims": claims,
         "decisions": decisions,
@@ -84,14 +85,48 @@ async def api_state(user_id: str = "local"):
 async def api_run(user_id: str = "local"):
     async with _lock:
         if settings.agent_runtime_arn:
-            from .agentcore_client import invoke_runtime
+            # Hosted mode: a run takes ~45 s, longer than API Gateway allows, so start it in the
+            # background (a self-invocation of this Lambda) and let the page poll /api/state.
+            store = get_store()
+            state = store.load(user_id)
+            if state.is_running():
+                return {"started": False, "already_running": True}
+            from .models import now
 
-            out = await asyncio.to_thread(invoke_runtime, {"action": "run", "user_id": user_id, "trigger": "dashboard"})
-            return JSONResponse(out)
+            state.running_since = now()
+            store.save(state)
+            _start_background_run(user_id)
+            return {"started": True}
         from .run import run_daily
 
         report = await run_daily(user_id, trigger="dashboard")
         return report.model_dump(mode="json")
+
+
+def _start_background_run(user_id: str) -> None:
+    import json
+    import os
+    import threading
+
+    payload = {"action": "run", "user_id": user_id, "trigger": "dashboard"}
+    fn = os.getenv("AWS_LAMBDA_FUNCTION_NAME")
+    if fn:
+        import boto3
+
+        boto3.client("lambda", region_name=settings.aws_region).invoke(
+            FunctionName=fn, InvocationType="Event", Payload=json.dumps(payload).encode()
+        )
+        return
+    from .agentcore_client import invoke_runtime
+
+    threading.Thread(target=invoke_runtime, args=(payload,), daemon=True).start()
+
+
+def run_via_runtime(payload: dict) -> dict:
+    """Entry for the background self-invocation (see infra/deploy_web.py)."""
+    from .agentcore_client import invoke_runtime
+
+    return invoke_runtime(payload)
 
 
 class DecideBody(BaseModel):
@@ -128,7 +163,7 @@ class ResolveBody(BaseModel):
 
 @app.post("/api/resolve")
 async def api_resolve(body: ResolveBody):
-    from .run import resolve_claim
+    from .claims import resolve_claim
 
     try:
         resolve_claim(body.claim_id, body.outcome, body.user_id)

@@ -6,6 +6,10 @@
 
 **Track:** Everyday Agents
 
+**Live demo (try it):** https://nj9f6ojm51.execute-api.us-east-1.amazonaws.com/
+
+**Repo:** https://github.com/fakemovement/refund-hunter
+
 ## Inspiration
 
 Stores owe people money constantly: price drops inside a price-adjustment window, shipping fees on

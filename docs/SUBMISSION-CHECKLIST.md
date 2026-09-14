@@ -26,7 +26,8 @@
 - Architecture diagram: upload `docs/architecture.png` as a project image (also in the README)
 - Screenshots: `docs/dashboard.png`
 - AWS Builder ID email: the one on your Builder ID
-- Live demo link: optional; skip unless the dashboard is hosted
+- Live demo link: https://nj9f6ojm51.execute-api.us-east-1.amazonaws.com/
+  (Lambda + function URL, wired to the AgentCore runtime; Reset is hidden there unless you open it with `#admin`)
 - Pre-existing code disclosure: "Deployment config (AgentCore CDK scaffold) reused from my earlier
   project; all agent code written during the submission period."
 - Built with: Python, Strands Agents SDK, Amazon Bedrock, AgentCore Runtime, DynamoDB, S3,

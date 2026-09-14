@@ -127,6 +127,13 @@ class State(BaseModel):
     runs: list[RunReport] = Field(default_factory=list)
     seen_email_ids: list[str] = Field(default_factory=list)
     updated_at: datetime = Field(default_factory=now)
+    # Set by the web tier when it starts a background run; cleared by run_daily when it ends.
+    running_since: datetime | None = None
+
+    def is_running(self) -> bool:
+        if not self.running_since:
+            return False
+        return (now() - self.running_since).total_seconds() < 240
 
     # -- helpers ------------------------------------------------------------
     def purchase(self, purchase_id: str) -> Purchase | None:
