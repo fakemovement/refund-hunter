@@ -40,10 +40,10 @@ class UserSettings(BaseModel):
     safe_mode: bool = True  # send every claim to yourself instead of the store
     # notifications
     notify_by_email: bool = False
-    dashboard_url: str = "http://127.0.0.1:8000"
+    dashboard_url: str = ""
     # you
     owner_name: str = "Sam Rivera"
-    owner_email: str = "sam.rivera.demo@example.com"
+    owner_email: str = "you@email.com"
     # behaviour
     followup_after_days: int = 5
     min_claim_amount: float = 3.0

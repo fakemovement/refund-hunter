@@ -8,8 +8,11 @@ import json, os, subprocess, sys, urllib.request, urllib.error
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # ReelEngine
 VOICE = "TABZn6CDfjMNGrsnGzzD"      # WikiBrad - Fast & Informative (same as the reels)
 MODEL = "eleven_multilingual_v2"   # steadier and more natural than v3, far fewer dramatic pauses
-SETTINGS = {"stability": 0.55, "similarity_boost": 0.8, "style": 0.28, "speed": 1.0}
-FFPROBE = r"C:\Users\jonat\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffprobe.exe"
+# A touch slower and steadier so it doesn't rush, and low style so it stops "performing".
+SETTINGS = {"stability": 0.62, "similarity_boost": 0.8, "style": 0.22, "speed": 0.93}
+FFDIR = r"C:\Users\jonat\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin"
+FFPROBE = FFDIR + r"\ffprobe.exe"
+FFMPEG = FFDIR + r"\ffmpeg.exe"
 
 # Conversational, plain sentences. No em-dashes or colons, which is what made the
 # earlier take stop and "perform" mid-line. Numbers are spelled the way a person
@@ -30,7 +33,18 @@ SCENES = [
     ("close",     "That's Refund Hunter. It quietly collects the money you're owed, and only speaks up when it really needs you."),
 ]
 
-TAIL = 0.55   # seconds of quiet held after the voice in each scene
+TAIL = 0.45   # uniform quiet held after the (silence-trimmed) voice in each scene
+
+
+def trim_silence(src, dst):
+    """Trim leading and trailing silence so every clip starts and ends clean.
+    That is what makes the gap between scenes even instead of random."""
+    sr = ("silenceremove=start_periods=1:start_duration=0.02:start_threshold=-40dB:detection=peak,"
+          "areverse,"
+          "silenceremove=start_periods=1:start_duration=0.02:start_threshold=-40dB:detection=peak,"
+          "areverse")
+    subprocess.run([FFMPEG, "-y", "-i", src, "-af", sr, dst],
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
 
 def env(key):
@@ -65,8 +79,11 @@ def main():
             audio = urllib.request.urlopen(req).read()
         except urllib.error.HTTPError as e:
             sys.exit(f"ElevenLabs {e.code} on {sid}: {e.read().decode()[:300]}")
-        with open(mp3, "wb") as f:
+        raw = mp3 + ".raw.mp3"
+        with open(raw, "wb") as f:
             f.write(audio)
+        trim_silence(raw, mp3)
+        os.remove(raw)
         d = dur(mp3)
         scene_dur = round(d + TAIL, 2)
         scenes.append({"id": sid, "voice": round(d, 2), "dur": scene_dur, "audio": f"rh/voice/{sid}.mp3"})

@@ -1,82 +1,82 @@
 {
-  "total": 76.16,
+  "total": 74.1,
   "scenes": [
     {
       "id": "hook",
-      "voice": 5.39,
+      "voice": 5.49,
       "dur": 5.94,
       "audio": "rh/voice/hook.mp3"
     },
     {
       "id": "example",
-      "voice": 6.87,
-      "dur": 7.42,
+      "voice": 6.7,
+      "dur": 7.15,
       "audio": "rh/voice/example.mp3"
     },
     {
       "id": "chore",
-      "voice": 6.32,
-      "dur": 6.87,
+      "voice": 6.22,
+      "dur": 6.67,
       "audio": "rh/voice/chore.mp3"
     },
     {
       "id": "meet",
-      "voice": 4.5,
-      "dur": 5.05,
+      "voice": 4.49,
+      "dur": 4.94,
       "audio": "rh/voice/meet.mp3"
     },
     {
       "id": "flow",
-      "voice": 5.06,
-      "dur": 5.61,
+      "voice": 4.77,
+      "dur": 5.22,
       "audio": "rh/voice/flow.mp3"
     },
     {
       "id": "run",
-      "voice": 6.04,
-      "dur": 6.59,
+      "voice": 6.01,
+      "dur": 6.46,
       "audio": "rh/voice/run.mp3"
     },
     {
       "id": "ask",
-      "voice": 6.13,
-      "dur": 6.68,
+      "voice": 6.21,
+      "dur": 6.66,
       "audio": "rh/voice/ask.mp3"
     },
     {
       "id": "approve",
-      "voice": 4.32,
-      "dur": 4.87,
+      "voice": 4.3,
+      "dur": 4.75,
       "audio": "rh/voice/approve.mp3"
     },
     {
       "id": "email",
-      "voice": 3.9,
-      "dur": 4.45,
+      "voice": 3.89,
+      "dur": 4.34,
       "audio": "rh/voice/email.mp3"
     },
     {
       "id": "interrupt",
-      "voice": 5.29,
-      "dur": 5.84,
+      "voice": 5.08,
+      "dur": 5.53,
       "audio": "rh/voice/interrupt.mp3"
     },
     {
       "id": "settings",
-      "voice": 4.88,
-      "dur": 5.43,
+      "voice": 4.93,
+      "dur": 5.38,
       "audio": "rh/voice/settings.mp3"
     },
     {
       "id": "aws",
-      "voice": 5.94,
-      "dur": 6.49,
+      "voice": 5.68,
+      "dur": 6.13,
       "audio": "rh/voice/aws.mp3"
     },
     {
       "id": "close",
-      "voice": 4.37,
-      "dur": 4.92,
+      "voice": 4.48,
+      "dur": 4.93,
       "audio": "rh/voice/close.mp3"
     }
   ]

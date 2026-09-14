@@ -298,7 +298,7 @@ const SHOT_CFG: Partial<Record<SceneId, Shot>> = {
   approve: { shot: 'run', from: { fx: 0.42, fy: 0.135, z: 1.5 }, to: { fx: 0.30, fy: 0.15, z: 1.7 },
     cursor: [{ fx: 0.8, fy: 0.2, t: 0 }, { fx: 0.227, fy: 0.1505, t: 2.2 }, { fx: 0.227, fy: 0.1505, t: 4.9 }], clicks: [2.6] },
   email: { shot: 'final', from: { fx: 0.42, fy: 0.5, z: 1.25 }, to: { fx: 0.42, fy: 0.52, z: 1.42 } },
-  settings: { shot: 'settings', from: { fx: 0.5, fy: 0.26, z: 1.12 }, to: { fx: 0.5, fy: 0.6, z: 1.2 },
+  settings: { shot: 'settings', from: { fx: 0.5, fy: 0.24, z: 1.14 }, to: { fx: 0.5, fy: 0.74, z: 1.2 },
     cursor: [{ fx: 0.62, fy: 0.24, t: 0.4 }, { fx: 0.62, fy: 0.24, t: 2.2 }, { fx: 0.30, fy: 0.62, t: 4.4 }, { fx: 0.30, fy: 0.62, t: 5.4 }] },
 };
 

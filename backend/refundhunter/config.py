@@ -84,12 +84,12 @@ class Settings(BaseSettings):
     # (dry run) so a demo never emails a real store.
     claims_to_override: str | None = None
     owner_name: str = "Sam Rivera"
-    owner_email: str = "sam.rivera.demo@example.com"
+    owner_email: str = "you@email.com"
 
     # --- notifications ---------------------------------------------------------
     # Email the person a short digest when a run finds decisions waiting for them.
     notify_by_email: bool = False
-    dashboard_url: str = "http://127.0.0.1:8000"
+    dashboard_url: str = ""
 
     # --- behaviour -------------------------------------------------------------
     followup_after_days: int = 5
