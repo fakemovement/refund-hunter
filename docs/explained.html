@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Refund Hunter, explained simply</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font: 13.5pt/1.5 "Segoe UI", Helvetica, Arial, sans-serif; color: #1a1a1a; margin: 0; }
+  h1 { font-size: 30pt; margin: 0 0 4pt; letter-spacing: -.01em; }
+  .sub { color: #555; font-size: 14pt; margin: 0 0 18pt; }
+  h2 { font-size: 19pt; margin: 26pt 0 8pt; padding-top: 6pt; border-top: 2px solid #eee; }
+  p { margin: 0 0 10pt; }
+  .story { background: #fff7e6; border-left: 5px solid #e0a020; padding: 12pt 14pt; border-radius: 6pt; margin: 0 0 12pt; }
+  .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; margin: 8pt 0 6pt; }
+  .step { border: 1.5px solid #ddd; border-radius: 10pt; padding: 10pt 12pt; }
+  .step .n { display: inline-block; width: 22pt; height: 22pt; line-height: 22pt; text-align: center; border-radius: 50%; background: #1a1a1a; color: #fff; font-weight: 700; font-size: 11pt; margin-right: 6pt; }
+  .step b { font-size: 13.5pt; }
+  .step p { margin: 6pt 0 0; font-size: 12pt; color: #333; }
+  .chat { border: 1.5px solid #cfd8e3; background: #f3f7fc; border-radius: 12pt; padding: 12pt 14pt; margin: 8pt 0 12pt; }
+  .chat .who { font-size: 10.5pt; color: #557; text-transform: uppercase; letter-spacing: .06em; }
+  .chat .msg { margin: 2pt 0 10pt; }
+  .chat .you { text-align: right; }
+  .chat .btn { display: inline-block; border: 1.5px solid #137a4b; color: #137a4b; border-radius: 6pt; padding: 2pt 10pt; font-weight: 600; font-size: 12pt; }
+  .flow { display: flex; align-items: stretch; gap: 6pt; margin: 10pt 0 14pt; }
+  .flow .box { flex: 1; border: 1.5px solid #333; border-radius: 8pt; padding: 8pt 6pt; text-align: center; font-size: 11.5pt; }
+  .flow .box small { display: block; color: #666; font-size: 10pt; margin-top: 2pt; }
+  .flow .arrow { align-self: center; font-size: 18pt; color: #666; }
+  .flow .box.pause { background: #fff7e6; border-color: #c77d00; }
+  .flow .box.agent { background: #e8f1ff; border-color: #0f5fd6; }
+  ul { margin: 0 0 10pt 18pt; padding: 0; }
+  li { margin-bottom: 5pt; }
+  .kid { background: #e9f7ee; border-left: 5px solid #137a4b; padding: 10pt 14pt; border-radius: 6pt; margin: 10pt 0; }
+  .kid b { color: #137a4b; }
+  table { border-collapse: collapse; width: 100%; font-size: 12pt; margin: 6pt 0 12pt; }
+  th, td { text-align: left; padding: 6pt 8pt; border-bottom: 1px solid #e3e3e3; vertical-align: top; }
+  th { font-size: 10.5pt; color: #666; text-transform: uppercase; letter-spacing: .05em; }
+  img { max-width: 100%; border: 1px solid #ddd; border-radius: 8pt; }
+  .pagebreak { page-break-before: always; }
+  .foot { color: #777; font-size: 10.5pt; margin-top: 20pt; }
+</style>
+</head>
+<body>
+
+<h1>Refund Hunter</h1>
+<p class="sub">A little helper that gets your money back from stores, and only bothers you to ask "yes or no?"</p>
+
+<h2>The problem, in one story</h2>
+<div class="story">
+  <p>Sam buys an air fryer at Target for <b>$129.99</b>. Nine days later, Target drops the price to <b>$107.99</b>.</p>
+  <p>Here's the thing most people don't know: Target has a rule. If <em>their own</em> price drops within 14 days of your order, they will give you the difference back. That's <b>$22</b>, just for asking.</p>
+  <p>But Sam would have to notice the price dropped, know the rule exists, dig up the order number, write to Target, and then chase them if they don't answer. For $22? Nobody does that. So the store keeps the money.</p>
+</div>
+<p>This happens all the time. Costco gives you 30 days. Amazon gives your shipping fee back when a package arrives after the date it promised. Grocery delivery apps give a credit when the order is late. Small amounts, everywhere, that almost nobody collects.</p>
+
+<h2>What Refund Hunter does</h2>
+<p>Refund Hunter is a computer program, an <b>agent</b>, that does all of that boring work for you. Every morning, on its own:</p>
+
+<div class="steps">
+  <div class="step"><span class="n">1</span><b>It reads your receipts</b><p>It looks at the order emails in your inbox: what you bought, where, how much, when it was supposed to arrive. It ignores newsletters and messages from friends.</p></div>
+  <div class="step"><span class="n">2</span><b>It knows the rules</b><p>It has a little table of store rules: how many days you have to ask for a price adjustment, and what you get when a delivery is late.</p></div>
+  <div class="step"><span class="n">3</span><b>It checks</b><p>For every recent purchase, it looks up today's price and compares delivery dates with the promised ones.</p></div>
+  <div class="step"><span class="n">4</span><b>It asks you, once</b><p>When it finds money, it stops and asks one question. You tap <b>Yes</b> or <b>Skip</b>. If it finds nothing, you never hear from it.</p></div>
+  <div class="step"><span class="n">5</span><b>It sends the claim</b><p>If you said yes, it writes the email to the store with the order number, the dates, the rule, and the amount, and sends it.</p></div>
+  <div class="step"><span class="n">6</span><b>It follows up</b><p>If the store stays quiet for 5 days, it politely nudges them again. You don't have to remember anything.</p></div>
+</div>
+
+<div class="chat">
+  <div class="who">Refund Hunter</div>
+  <div class="msg">Target dropped the price of your air fryer from $129.99 to $107.99. You ordered it 9 days ago, so you're still inside Target's 14-day window. Want me to claim <b>$22.00</b>?</div>
+  <div class="who you">You</div>
+  <div class="msg you"><span class="btn">Yes, file it</span></div>
+  <div class="who">Refund Hunter</div>
+  <div class="msg">Done. I emailed Target with your order number and the rule. I'll check back in 5 days if they don't reply.</div>
+</div>
+
+<div class="kid">
+  <p><b>The simplest way to say it:</b> imagine a very patient friend who reads all your receipts, knows every store's fine print, checks prices every day, and never sends anything without asking you first. That's Refund Hunter.</p>
+</div>
+
+<div class="pagebreak"></div>
+
+<h2>How it works under the hood</h2>
+<p>Refund Hunter is made of two small "brains" and a few tools. Each brain is an <b>AI agent</b>, built with a toolkit called <b>Strands Agents</b> and powered by Claude, an AI model running on Amazon's cloud.</p>
+
+<div class="flow">
+  <div class="box">Your inbox<small>order &amp; delivery emails</small></div>
+  <div class="arrow">→</div>
+  <div class="box agent">Reader<small>turns emails into a tidy list of purchases</small></div>
+  <div class="arrow">→</div>
+  <div class="box agent">Hunter<small>checks rules, prices, and dates</small></div>
+  <div class="arrow">→</div>
+  <div class="box pause">Pause<small>asks you: yes or skip?</small></div>
+  <div class="arrow">→</div>
+  <div class="box">Claim email<small>sent to the store</small></div>
+</div>
+
+<p><b>The Reader.</b> Emails are messy. The Reader's only job is to read them and fill in a neat form for each purchase: store, item, price, order date, promised delivery date, and later, the day it actually arrived. It's told to never make anything up: if an email doesn't say a date, the field stays empty.</p>
+
+<p><b>The Hunter.</b> This is the one that thinks. It has five tools it can use, like buttons on a remote:</p>
+<table>
+  <tr><th>Tool</th><th>What it does</th></tr>
+  <tr><td>list purchases</td><td>"Show me everything recent that's still worth checking."</td></tr>
+  <tr><td>look up policy</td><td>"What are Target's rules?" (from the little table of store rules)</td></tr>
+  <tr><td>check price</td><td>"What does this item cost today?" (reads the product page)</td></tr>
+  <tr><td>close purchase</td><td>"This one is too old, stop checking it." (with a reason)</td></tr>
+  <tr><td>file claim</td><td>"There's money here." This tool <b>stops and asks you</b> before doing anything.</td></tr>
+</table>
+
+<p><b>The pause is the clever part.</b> When the Hunter presses "file claim," the program freezes right in the middle of the job and saves its exact spot, like bookmarking a page. The question appears on your screen. You might answer in ten seconds or in two days. When you do, the Hunter wakes up at the bookmark and carries on: yes means it writes and sends the email, skip means it drops it. Programmers call this an <b>interrupt</b>. It's what makes the agent safe: it can never send anything you didn't approve.</p>
+
+<p><b>The schedule.</b> A timer in the cloud (Amazon EventBridge) wakes the agent once a day. The agent's memory (your purchases, claims, and answers) is kept in a cloud database (DynamoDB). The bookmarks for paused questions are kept in cloud storage (S3). The agent itself runs on Amazon Bedrock AgentCore, which is like a room in the cloud where the agent lives and works.</p>
+
+<h2>What you see</h2>
+<p>One simple page. Four numbers at the top: money found, money claimed, questions waiting for you, purchases being watched. Below that: the questions, the claims, your purchases, and every email the agent sent, so you can read them yourself.</p>
+<img src="dashboard.png" alt="The Refund Hunter dashboard">
+
+<h2>Things worth knowing</h2>
+<ul>
+  <li><b>It never spends or sends without a yes.</b> The only thing it does on its own is read and check.</li>
+  <li><b>The demo uses a pretend inbox.</b> Made-up person, made-up orders. The same program can read a real Gmail inbox if you give it permission.</li>
+  <li><b>The store rules live in a plain text file</b> anyone can edit. If a store changes its policy, you change one line.</li>
+  <li><b>If it can't find today's price</b> for something, it claims nothing. Better silent than wrong.</li>
+</ul>
+
+<p class="foot">Refund Hunter was built for the AWS "Agents for Humans" hackathon, Everyday Agents track, with the Strands Agents SDK and Amazon Bedrock AgentCore. Open source, MIT license: github.com/fakemovement/refund-hunter</p>
+
+</body>
+</html>
