@@ -16,3 +16,12 @@ backend/.env.deployed
 docs/*.mp4
 video/out/
 video/
+# personal prep / helper docs (kept locally, not part of the submission repo)
+docs/guide/
+docs/guide.html
+docs/explained.html
+docs/*.pdf
+docs/devpost.md
+docs/blog-post.md
+docs/video-script.md
+docs/SUBMISSION-CHECKLIST.md
