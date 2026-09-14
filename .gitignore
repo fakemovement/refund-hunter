@@ -15,3 +15,4 @@ agentcore/.cli/
 backend/.env.deployed
 docs/*.mp4
 video/out/
+video/
