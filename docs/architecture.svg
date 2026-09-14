@@ -48,10 +48,10 @@
   <text x="700" y="186" text-anchor="middle" class="s">Strands Agent · 5 tools · session</text>
   <text x="700" y="204" text-anchor="middle" class="s">policy → price → delivery → claim</text>
 
-  <rect x="350" y="260" width="460" height="120" class="box"/>
+  <rect x="340" y="260" width="480" height="120" class="box"/>
   <text x="580" y="284" text-anchor="middle" class="h">Tools (@tool, shared State via invocation_state)</text>
   <text x="580" y="308" text-anchor="middle" class="s">list_open_purchases · lookup_policy · check_price · close_purchase</text>
-  <text x="580" y="330" text-anchor="middle" class="s">file_claim → raises a Strands interrupt → waits for the human → resumes → sends the claim email</text>
+  <text x="580" y="330" text-anchor="middle" class="s" font-size="11.5">file_claim → Strands interrupt → waits for the human → resumes → sends the claim email</text>
   <text x="580" y="356" text-anchor="middle" class="s">follow-ups after 5 quiet days · one daily report</text>
 
   <rect x="350" y="410" width="220" height="60" class="box aws"/>
