@@ -1,0 +1,10 @@
+{
+  "_note": "Simulated 'current price' feed for the demo. Keys are the item URLs from the receipts. In real use the price tool fetches the page and reads its schema.org Product data first and only falls back to this file.",
+  "prices": {
+    "https://www.target.com/p/ninja-foodi-dz201-air-fryer/-/A-79463150": 107.99,
+    "https://www.costco.com/dyson-v11-cordless-stick-vacuum.product.100751152.html": 449.99,
+    "https://www.bestbuy.com/site/sony-wh-1000xm5/6505727.p": 299.99,
+    "https://www.walmart.com/ip/Instant-Pot-Duo-6-Qt/55501207": 89.00,
+    "https://www.homedepot.com/p/DEWALT-20V-MAX-Cordless-Drill-Driver-Kit/205331000": 99.00
+  }
+}

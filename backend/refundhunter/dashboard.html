@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Refund Hunter</title>
+<style>
+  :root{--bg:#f6f5f2;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e6e3dc;--green:#137a4b;--amber:#b7791f;--red:#b23b3b;--accent:#0f5fd6;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--line);background:var(--card)}
+  h1{margin:0;font-size:20px;letter-spacing:-.01em}
+  h1 small{color:var(--muted);font-weight:400;margin-left:10px;font-size:13px}
+  main{max-width:1080px;margin:0 auto;padding:24px 20px 60px}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .tile .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .tile .v{font-size:28px;font-weight:600;margin-top:4px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:18px}
+  section h2{margin:0 0 12px;font-size:15px;display:flex;align-items:center;gap:10px}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#444}
+  .badge.amber{background:#fbf1dc;color:var(--amber)}
+  .badge.green{background:#e2f3ea;color:var(--green)}
+  .badge.red{background:#f8e3e3;color:var(--red)}
+  .badge.blue{background:#e3ecfb;color:var(--accent)}
+  button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;cursor:pointer}
+  button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button.approve{background:var(--green);color:#fff;border-color:var(--green)}
+  button:disabled{opacity:.5;cursor:default}
+  .decision{border:1px solid #f0e2c4;background:#fffaf0;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+  .decision .q{font-weight:600;margin-bottom:6px}
+  .decision .why{color:var(--muted);font-size:13px;margin-bottom:10px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:500}
+  .muted{color:var(--muted)}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;white-space:pre-wrap}
+  .log{background:#111;color:#d8d8d8;border-radius:10px;padding:12px 14px;max-height:260px;overflow:auto}
+  .empty{color:var(--muted);font-style:italic}
+  details summary{cursor:pointer;color:var(--accent);font-size:13px}
+  #status{font-size:13px;color:var(--muted)}
+  .spin{display:inline-block;width:12px;height:12px;border:2px solid #ccc;border-top-color:#333;border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  @media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Refund Hunter <small id="owner"></small></h1>
+  <div class="row">
+    <span id="status"></span>
+    <button id="run" class="primary">Run today's check</button>
+    <button id="reset" title="Wipe the demo state">Reset demo</button>
+  </div>
+</header>
+<main>
+  <div class="tiles">
+    <div class="tile"><div class="k">Money found</div><div class="v" id="t-found">$0</div></div>
+    <div class="tile"><div class="k">Claims filed</div><div class="v" id="t-filed">$0</div></div>
+    <div class="tile"><div class="k">Needs you</div><div class="v" id="t-waiting">0</div></div>
+    <div class="tile"><div class="k">Purchases watched</div><div class="v" id="t-open">0</div></div>
+  </div>
+
+  <section id="needs-you">
+    <h2>Needs you <span class="badge amber" id="b-waiting">0</span></h2>
+    <div id="decisions"></div>
+  </section>
+
+  <section>
+    <h2>Claims</h2>
+    <div id="claims"></div>
+  </section>
+
+  <section>
+    <h2>Purchases <span class="badge" id="b-purchases">0</span></h2>
+    <div id="purchases"></div>
+  </section>
+
+  <section>
+    <h2>Emails the agent sent <span class="badge" id="b-outbox">0</span></h2>
+    <div id="outbox"></div>
+  </section>
+
+  <section>
+    <h2>Runs</h2>
+    <div id="runs"></div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const money = v => '$' + (Number(v||0)).toFixed(2);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let busy = false;
+
+function setBusy(on, text){ busy = on; $('#run').disabled = on; $('#reset').disabled = on;
+  $('#status').innerHTML = on ? '<span class="spin"></span>' + esc(text||'Working…') : (text||''); }
+
+async function load(){
+  const s = await (await fetch('/api/state')).json();
+  $('#owner').textContent = s.owner + ' · ' + (s.mode === 'agentcore' ? 'AgentCore runtime' : 'local agent') + ' · ' + (s.smtp ? 'email on' : 'dry-run outbox');
+  $('#t-found').textContent = money(s.totals.found);
+  $('#t-filed').textContent = money(s.totals.filed);
+  $('#t-waiting').textContent = s.totals.waiting;
+  $('#t-open').textContent = s.totals.open_purchases;
+  $('#b-waiting').textContent = s.decisions.length;
+  $('#b-purchases').textContent = s.purchases.length;
+  $('#b-outbox').textContent = s.outbox.length;
+
+  $('#decisions').innerHTML = s.decisions.length ? s.decisions.map(d => `
+    <div class="decision">
+      <div class="q">${esc(d.merchant)}: claim ${money(d.amount)} for ${esc(d.kind.replace('_',' '))} on “${esc(d.item)}”?</div>
+      <div class="why">${esc(d.reason)}<br><span class="muted">Rule: ${esc(d.policy)}</span></div>
+      <div class="row">
+        <button class="approve" onclick="decide('${d.interrupt_id}','approve')">Yes, file it</button>
+        <button onclick="decide('${d.interrupt_id}','skip')">Skip</button>
+      </div>
+    </div>`).join('') : '<div class="empty">Nothing needs you. The agent will ask here when it finds money and needs a yes.</div>';
+
+  const badge = st => ({pending_approval:'amber',filed:'blue',followed_up:'blue',resolved:'green',skipped:''}[st]||'');
+  $('#claims').innerHTML = s.claims.length ? `<table><tr><th>Store</th><th>Item</th><th>Kind</th><th>Amount</th><th>Status</th><th></th></tr>` +
+    s.claims.map(c => `<tr><td>${esc(c.merchant)}</td><td>${esc(c.item)}<div class="muted" style="font-size:12px">${esc(c.reason)}</div></td>
+      <td>${esc(c.kind.replace('_',' '))}</td><td>${money(c.amount)}</td>
+      <td><span class="badge ${badge(c.status)}">${esc(c.status.replace('_',' '))}</span>${c.outcome?`<div class="muted" style="font-size:12px">${esc(c.outcome)}</div>`:''}</td>
+      <td>${['filed','followed_up'].includes(c.status) ? `<button onclick="resolve('${c.id}','refund received')">Got the refund</button> <button onclick="resolve('${c.id}','store refused')">Refused</button>`:''}</td></tr>`).join('') + '</table>'
+    : '<div class="empty">No claims yet.</div>';
+
+  $('#purchases').innerHTML = s.purchases.length ? `<table><tr><th>Store</th><th>Item</th><th>Paid</th><th>Ordered</th><th>Delivery</th><th>Status</th></tr>` +
+    s.purchases.map(p => `<tr><td>${esc(p.merchant)}</td><td>${esc(p.item)}<div class="muted" style="font-size:12px">${esc(p.order_id)}</div></td>
+      <td>${money(p.price)}${p.quantity>1?' ×'+p.quantity:''}${p.shipping_fee?`<div class="muted" style="font-size:12px">+${money(p.shipping_fee)} shipping</div>`:''}</td>
+      <td>${esc(p.order_date)}</td>
+      <td>${p.promised_delivery?'promised '+esc(p.promised_delivery):''}${p.delivered_on?'<br>arrived '+esc(p.delivered_on):''}${p.notes?`<div class="muted" style="font-size:12px">${esc(p.notes)}</div>`:''}</td>
+      <td><span class="badge ${p.status==='claimed'?'blue':p.status==='closed'?'':'green'}">${esc(p.status)}</span></td></tr>`).join('') + '</table>'
+    : '<div class="empty">No purchases yet. Run today\'s check to read the inbox.</div>';
+
+  $('#outbox').innerHTML = s.outbox.length ? s.outbox.map(m => `
+    <details><summary>${esc(m.subject)} → ${esc(m.to)} <span class="badge ${m.delivered?'green':''}">${m.delivered?'sent':'outbox (dry run)'}</span></summary>
+    <div class="mono" style="margin:8px 0 14px">${esc(m.body)}</div></details>`).join('') : '<div class="empty">Nothing sent yet.</div>';
+
+  $('#runs').innerHTML = s.runs.length ? s.runs.map(r => `
+    <details ${r===s.runs[0]?'open':''}><summary>${esc((r.started_at||'').replace('T',' ').slice(0,16))} · ${esc(r.trigger)} · ${esc(r.summary||'')}</summary>
+    <div class="log mono" style="margin:8px 0 14px">${esc((r.log||[]).join('\n'))}</div></details>`).join('') : '<div class="empty">No runs yet.</div>';
+}
+
+async function post(url, body){ const r = await fetch(url, {method:'POST', headers:{'content-type':'application/json'}, body: body?JSON.stringify(body):null}); if(!r.ok){ throw new Error(await r.text()); } return r.json(); }
+
+$('#run').onclick = async () => { if(busy) return; setBusy(true,'Reading mail and checking stores…'); try{ const r = await post('/api/run'); setBusy(false, r.summary||'Done'); }catch(e){ setBusy(false,'Error: '+e.message); } load(); };
+$('#reset').onclick = async () => { if(busy) return; if(!confirm('Wipe the demo state?')) return; await post('/api/reset'); setBusy(false,'Reset'); load(); };
+window.decide = async (id, answer) => { if(busy) return; setBusy(true, answer==='approve'?'Filing the claim…':'Skipping…'); try{ const r = await post('/api/decide',{interrupt_id:id, answer}); setBusy(false, r.summary||'Done'); }catch(e){ setBusy(false,'Error: '+e.message); } load(); };
+window.resolve = async (id, outcome) => { await post('/api/resolve',{claim_id:id, outcome}); load(); };
+load();
+</script>
+</body>
+</html>

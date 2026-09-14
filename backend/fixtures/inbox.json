@@ -1,0 +1,89 @@
+{
+  "_note": "Synthetic inbox for the demo. No real people, orders, or addresses. days_ago is relative to the day the demo runs; {{date-9}} renders as the calendar date nine days ago.",
+  "emails": [
+    {
+      "id": "em_target_order",
+      "days_ago": 9,
+      "from": "orders@target.example",
+      "subject": "Thanks for your order! Order #102-5583920",
+      "body": "Hi Sam,\n\nThanks for shopping at Target.com. Here is your order summary.\n\nOrder #102-5583920\nOrder date: {{date-9}}\n\n1 x Ninja Foodi 6-in-1 8-qt 2-Basket Air Fryer (DZ201)\nPrice: $129.99\nItem page: https://www.target.com/p/ninja-foodi-dz201-air-fryer/-/A-79463150\n\nSubtotal: $129.99\nShipping: FREE\nTax: $12.03\nTotal: $142.02\n\nWe'll email you when it ships."
+    },
+    {
+      "id": "em_target_shipped",
+      "days_ago": 7,
+      "from": "orders@target.example",
+      "subject": "Your order #102-5583920 has shipped",
+      "body": "Good news, Sam. Your Ninja Foodi DZ201 Air Fryer is on its way. Estimated arrival: {{date-5}}. Track your package in the Target app."
+    },
+    {
+      "id": "em_costco_order",
+      "days_ago": 12,
+      "from": "orderstatus@costco.example",
+      "subject": "Costco.com Order Confirmation 5211093774",
+      "body": "Order number: 5211093774\nOrder date: {{date-12}}\n\nDyson V11 Cordless Stick Vacuum, Extra Tools\nQty 1  $499.99\nhttps://www.costco.com/dyson-v11-cordless-stick-vacuum.product.100751152.html\n\nShipping & Handling: $0.00\nTax: $46.25\nOrder Total: $546.24\n\nThank you for shopping with Costco."
+    },
+    {
+      "id": "em_bestbuy_order",
+      "days_ago": 20,
+      "from": "bestbuyinfo@bestbuy.example",
+      "subject": "Your Best Buy order BBY01-806623014 is confirmed",
+      "body": "Order BBY01-806623014 placed {{date-20}}\n\nSony WH-1000XM5 Wireless Noise Canceling Headphones - Black\n1 @ $348.00\nhttps://www.bestbuy.com/site/sony-wh-1000xm5/6505727.p\n\nShipping: Free standard\nTotal: $379.32\n\nQuestions? Visit our help center."
+    },
+    {
+      "id": "em_amazon_order",
+      "days_ago": 8,
+      "from": "auto-confirm@amazon.example",
+      "subject": "Your Amazon.com order #113-4471820-2291001",
+      "body": "Hello Sam Rivera,\n\nThank you for your order. We'll send a confirmation when your item ships.\n\nOrder #113-4471820-2291001\nPlaced on {{date-8}}\n\nLEGO Icons Botanical Collection Orchid 10311\nQty: 1  $49.99\n\nShipping speed: One-Day Shipping  $12.99\nGuaranteed delivery date: {{date-6}}\n\nItem subtotal: $49.99\nShipping & handling: $12.99\nTotal before tax: $62.98\nEstimated tax: $4.62\nOrder total: $67.60"
+    },
+    {
+      "id": "em_amazon_delivered",
+      "days_ago": 4,
+      "from": "shipment-tracking@amazon.example",
+      "subject": "Delivered: LEGO Icons Botanical Collection Orchid",
+      "body": "Your package was delivered on {{date-4}} at 3:12 PM. It was handed directly to a resident.\n\nOrder #113-4471820-2291001\n\nWe're sorry this arrived after the guaranteed delivery date. Track or manage your orders in Your Account."
+    },
+    {
+      "id": "em_instacart",
+      "days_ago": 2,
+      "from": "orders@instacart.example",
+      "subject": "Your Instacart order from Sprouts was delivered",
+      "body": "Hi Sam,\n\nYour order was delivered at 7:48 PM on {{date-2}}.\nOrder #IC-88214-7710\nScheduled delivery window: 5:00 PM - 6:00 PM\n\n14 items  $86.40\nDelivery fee: $3.99\nService fee: $6.05\nTip: $8.00\nTotal: $104.44\n\nThanks for shopping with Instacart."
+    },
+    {
+      "id": "em_walmart_order",
+      "days_ago": 6,
+      "from": "help@walmart.example",
+      "subject": "Thanks for your Walmart.com order 2000418-77193",
+      "body": "Order 2000418-77193\nOrder placed {{date-6}}\n\nInstant Pot Duo 7-in-1 Electric Pressure Cooker, 6 Qt\n1 x $89.00\nhttps://www.walmart.com/ip/Instant-Pot-Duo-6-Qt/55501207\n\nDelivery: Free, arriving {{date-3}}\nTotal: $97.17"
+    },
+    {
+      "id": "em_walmart_delivered",
+      "days_ago": 3,
+      "from": "help@walmart.example",
+      "subject": "Delivered: your Walmart.com order 2000418-77193",
+      "body": "Your order 2000418-77193 was delivered on {{date-3}} at 11:20 AM. Enjoy!"
+    },
+    {
+      "id": "em_newsletter",
+      "days_ago": 5,
+      "from": "news@bestbuy.example",
+      "subject": "Weekend deals: save up to 40% on TVs",
+      "body": "Big savings this weekend on TVs, laptops and more. Shop now at BestBuy.com. To unsubscribe, click here."
+    },
+    {
+      "id": "em_friend",
+      "days_ago": 1,
+      "from": "maya.k@example.com",
+      "subject": "dinner saturday?",
+      "body": "Hey! Are you free Saturday? Thinking tacos. Let me know."
+    },
+    {
+      "id": "em_homedepot_order",
+      "days_ago": 16,
+      "from": "orders@homedepot.example",
+      "subject": "Order Confirmation WG73015566",
+      "body": "Thank you for your order.\nOrder #WG73015566\nOrder date: {{date-16}}\n\nDEWALT 20V MAX Cordless Drill/Driver Kit\nQty 1  $99.00\nhttps://www.homedepot.com/p/DEWALT-20V-MAX-Cordless-Drill-Driver-Kit/205331000\n\nDelivery: Free\nTotal: $108.65"
+    }
+  ]
+}

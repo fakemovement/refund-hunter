@@ -1,0 +1,68 @@
+# Store policies used by Refund Hunter. Illustrative values for the demo; confirm against
+# each store's current policy page before relying on them.
+policies:
+  - merchant: Target
+    aliases: [target.com]
+    price_adjust_days: 14
+    price_adjust_how: "Price Match Guarantee: Target matches its own lower price within 14 days of purchase. Ask via Guest Services (chat/email) with the order number."
+    late_delivery: "No automatic credit; ask Guest Services for a shipping refund if a promised date is missed."
+    late_delivery_refund: shipping_fee
+    claims_email: guest.services@target.example
+    source: https://www.target.com/c/price-match-guarantee/-/N-4ipp7
+  - merchant: Best Buy
+    aliases: [bestbuy.com, bestbuy]
+    price_adjust_days: 15
+    price_adjust_how: "Price Match Guarantee covers Best Buy's own price drops during the return period (15 days for most customers). Contact customer service with the order number."
+    late_delivery: "Ask customer service for a shipping refund when a scheduled delivery date is missed."
+    late_delivery_refund: shipping_fee
+    claims_email: customer.service@bestbuy.example
+    source: https://www.bestbuy.com/site/help-topics/price-match-guarantee/pcmcat297300050000.c
+  - merchant: Costco
+    aliases: [costco.com]
+    price_adjust_days: 30
+    price_adjust_how: "Costco.com price adjustment within 30 days of the order when the online price drops. Submit the price adjustment request form with the order number."
+    late_delivery: "Contact Costco.com customer service for shipping-fee refund on missed delivery windows."
+    late_delivery_refund: shipping_fee
+    claims_email: price.adjustments@costco.example
+    source: https://customerservice.costco.com/app/answers/answer_view/a_id/1191
+  - merchant: Amazon
+    aliases: [amazon.com, amzn]
+    price_adjust_days: null
+    price_adjust_how: "Amazon no longer offers price adjustments after purchase."
+    late_delivery: "If a guaranteed delivery date is missed, Amazon refunds the shipping fees paid for that shipment on request."
+    late_delivery_refund: shipping_fee
+    claims_email: delivery.guarantee@amazon.example
+    source: https://www.amazon.com/gp/help/customer/display.html?nodeId=GXHKA2R4CLXQEQPD
+  - merchant: Walmart
+    aliases: [walmart.com]
+    price_adjust_days: null
+    price_adjust_how: "Walmart.com does not offer price adjustments after purchase."
+    late_delivery: "Ask customer care for a refund of delivery fees on late orders."
+    late_delivery_refund: shipping_fee
+    claims_email: help@walmart.example
+    source: https://www.walmart.com/help
+  - merchant: Instacart
+    aliases: [instacart.com]
+    price_adjust_days: null
+    price_adjust_how: ""
+    late_delivery: "Orders delivered after the promised window can request a late-delivery credit through Instacart support."
+    late_delivery_refund: fixed
+    late_delivery_fixed_amount: 5.0
+    claims_email: support@instacart.example
+    source: https://www.instacart.com/help
+  - merchant: DoorDash
+    aliases: [doordash.com]
+    price_adjust_days: null
+    late_delivery: "Late deliveries can be reported in the app for a credit or partial refund."
+    late_delivery_refund: fixed
+    late_delivery_fixed_amount: 5.0
+    claims_email: support@doordash.example
+    source: https://help.doordash.com
+  - merchant: Home Depot
+    aliases: [homedepot.com]
+    price_adjust_days: 30
+    price_adjust_how: "Price adjustment within 30 days when Home Depot's own price drops on the same item. Contact customer care with the order number."
+    late_delivery: "Ask customer care for a delivery-fee refund on a missed scheduled delivery."
+    late_delivery_refund: shipping_fee
+    claims_email: customercare@homedepot.example
+    source: https://www.homedepot.com/c/Price_Match_Guarantee

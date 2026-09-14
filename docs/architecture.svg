@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#444"/></marker>
+    <style>
+      .box{fill:#fff;stroke:#333;stroke-width:1.5;rx:10}
+      .aws{fill:#fff7e6;stroke:#c77d00}
+      .agent{fill:#e8f1ff;stroke:#0f5fd6}
+      .human{fill:#e9f7ee;stroke:#137a4b}
+      .t{font-size:15px;fill:#111}
+      .s{font-size:12px;fill:#555}
+      .h{font-size:13px;font-weight:600;fill:#333}
+      .line{stroke:#444;stroke-width:1.5;fill:none;marker-end:url(#arr)}
+      .lab{font-size:11.5px;fill:#333}
+    </style>
+  </defs>
+  <text x="600" y="34" text-anchor="middle" font-size="22" font-weight="600" fill="#111">Refund Hunter: architecture</text>
+  <text x="600" y="56" text-anchor="middle" class="s">A Strands agent that reads receipts, finds refunds you are owed, and files the claim after one tap.</text>
+
+  <!-- Inputs -->
+  <rect x="40" y="110" width="200" height="70" class="box"/>
+  <text x="140" y="138" text-anchor="middle" class="t">Inbox</text>
+  <text x="140" y="158" text-anchor="middle" class="s">Gmail (IMAP) or fixture inbox</text>
+
+  <rect x="40" y="220" width="200" height="70" class="box"/>
+  <text x="140" y="248" text-anchor="middle" class="t">Store product pages</text>
+  <text x="140" y="268" text-anchor="middle" class="s">schema.org price · demo price feed</text>
+
+  <rect x="40" y="330" width="200" height="70" class="box"/>
+  <text x="140" y="358" text-anchor="middle" class="t">Policy table</text>
+  <text x="140" y="378" text-anchor="middle" class="s">policies.yaml: windows &amp; refunds</text>
+
+  <!-- Schedule -->
+  <rect x="40" y="470" width="200" height="70" class="box aws"/>
+  <text x="140" y="498" text-anchor="middle" class="t">EventBridge Scheduler</text>
+  <text x="140" y="518" text-anchor="middle" class="s">once a day → "run"</text>
+
+  <!-- AgentCore runtime -->
+  <rect x="320" y="90" width="520" height="470" class="box aws" stroke-dasharray="6 4"/>
+  <text x="580" y="116" text-anchor="middle" class="h">Amazon Bedrock AgentCore Runtime · Python 3.12 · Claude Sonnet 4.6 on Bedrock</text>
+
+  <rect x="350" y="140" width="220" height="90" class="box agent"/>
+  <text x="460" y="166" text-anchor="middle" class="t">Receipt Reader</text>
+  <text x="460" y="186" text-anchor="middle" class="s">Strands Agent · structured output</text>
+  <text x="460" y="204" text-anchor="middle" class="s">emails → Purchase / Delivery facts</text>
+
+  <rect x="590" y="140" width="220" height="90" class="box agent"/>
+  <text x="700" y="166" text-anchor="middle" class="t">Hunter</text>
+  <text x="700" y="186" text-anchor="middle" class="s">Strands Agent · 5 tools · session</text>
+  <text x="700" y="204" text-anchor="middle" class="s">policy → price → delivery → claim</text>
+
+  <rect x="350" y="260" width="460" height="120" class="box"/>
+  <text x="580" y="284" text-anchor="middle" class="h">Tools (@tool, shared State via invocation_state)</text>
+  <text x="580" y="308" text-anchor="middle" class="s">list_open_purchases · lookup_policy · check_price · close_purchase</text>
+  <text x="580" y="330" text-anchor="middle" class="s">file_claim → raises a Strands interrupt → waits for the human → resumes → sends the claim email</text>
+  <text x="580" y="356" text-anchor="middle" class="s">follow-ups after 5 quiet days · one daily report</text>
+
+  <rect x="350" y="410" width="220" height="60" class="box aws"/>
+  <text x="460" y="434" text-anchor="middle" class="t">DynamoDB</text>
+  <text x="460" y="452" text-anchor="middle" class="s">state: purchases, claims, decisions, outbox</text>
+
+  <rect x="590" y="410" width="220" height="60" class="box aws"/>
+  <text x="700" y="434" text-anchor="middle" class="t">S3 session store</text>
+  <text x="700" y="452" text-anchor="middle" class="s">paused agent resumes hours later</text>
+
+  <rect x="350" y="490" width="460" height="50" class="box aws"/>
+  <text x="580" y="520" text-anchor="middle" class="s">SSM Parameter Store (secrets) · CloudWatch logs · AgentCore observability traces</text>
+
+  <!-- Outputs -->
+  <rect x="920" y="140" width="240" height="90" class="box human"/>
+  <text x="1040" y="166" text-anchor="middle" class="t">Dashboard (FastAPI)</text>
+  <text x="1040" y="186" text-anchor="middle" class="s">"Needs you": approve / skip</text>
+  <text x="1040" y="204" text-anchor="middle" class="s">money found · claims · emails sent</text>
+
+  <rect x="920" y="290" width="240" height="70" class="box"/>
+  <text x="1040" y="316" text-anchor="middle" class="t">Claim email to the store</text>
+  <text x="1040" y="336" text-anchor="middle" class="s">SMTP, or dry-run outbox for demos</text>
+
+  <rect x="920" y="410" width="240" height="70" class="box human"/>
+  <text x="1040" y="436" text-anchor="middle" class="t">The person</text>
+  <text x="1040" y="456" text-anchor="middle" class="s">hears from the agent only for a real decision</text>
+
+  <!-- arrows -->
+  <path d="M240,145 L350,170" class="line"/>
+  <path d="M240,255 L420,262" class="line"/>
+  <path d="M240,365 L350,330" class="line"/>
+  <path d="M240,505 L340,505 L340,470 L350,468" class="line"/>
+  <path d="M570,185 L590,185" class="line"/>
+  <path d="M700,230 L700,260" class="line"/>
+  <path d="M460,380 L460,410" class="line"/>
+  <path d="M700,380 L700,410" class="line"/>
+  <path d="M810,300 L920,320" class="line"/>
+  <path d="M840,185 L920,185" class="line"/>
+  <path d="M1040,230 L1040,410" class="line"/>
+  <text x="1055" y="250" class="lab">one tap</text>
+  <path d="M920,200 C880,240 880,300 810,335" class="line"/>
+  <text x="850" y="262" class="lab">approve / skip → agent resumes</text>
+
+  <text x="600" y="600" text-anchor="middle" class="s">Built for the AWS Agents for Humans Hackathon · Everyday Agents track · Strands Agents SDK · MIT</text>
+</svg>

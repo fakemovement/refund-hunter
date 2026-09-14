@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
+  "name": "RefundHunter",
+  "version": 1,
+  "managedBy": "CDK",
+  "tags": {
+    "agentcore:created-by": "agentcore-cli",
+    "agentcore:project-name": "RefundHunter",
+    "app": "refundhunter"
+  },
+  "runtimes": [
+    {
+      "name": "Hunter",
+      "description": "Refund Hunter (Strands Agents): reads receipts, finds refunds owed, files claims after a human yes",
+      "build": "CodeZip",
+      "entrypoint": "agentcore_main.py",
+      "codeLocation": "backend/",
+      "runtimeVersion": "PYTHON_3_12",
+      "networkMode": "PUBLIC",
+      "protocol": "HTTP",
+      "envVars": [
+        { "name": "RH_STORE", "value": "dynamodb" },
+        { "name": "RH_DDB_TABLE", "value": "refundhunter" },
+        { "name": "RH_SESSION_BACKEND", "value": "s3" },
+        { "name": "RH_SESSION_BUCKET", "value": "refundhunter-sessions-253184024603" },
+        { "name": "RH_DATA_DIR", "value": "/tmp/refundhunter" },
+        { "name": "RH_SSM_PARAM", "value": "/refundhunter/env" },
+        { "name": "RH_MODEL_PROVIDER", "value": "bedrock" },
+        { "name": "RH_AWS_REGION", "value": "us-east-1" },
+        { "name": "RH_MAIL_SOURCE", "value": "fixtures" },
+        { "name": "PYTHONUTF8", "value": "1" }
+      ],
+      "additionalPolicies": ["agentcore-policy.json"],
+      "lifecycleConfiguration": { "idleRuntimeSessionTimeout": 900, "maxLifetime": 3600 }
+    }
+  ],
+  "memories": [],
+  "knowledgeBases": [],
+  "credentials": [],
+  "evaluators": [],
+  "onlineEvalConfigs": [],
+  "agentCoreGateways": [],
+  "policyEngines": [],
+  "configBundles": [],
+  "abTests": [],
+  "harnesses": [],
+  "datasets": [],
+  "payments": []
+}

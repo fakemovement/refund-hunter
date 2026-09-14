@@ -1,0 +1,63 @@
+# Devpost submission text
+
+**Project name:** Refund Hunter
+
+**Tagline:** The agent that collects the small refunds you're owed, and only talks to you when it needs a yes.
+
+**Track:** Everyday Agents
+
+## Inspiration
+
+Stores owe people money constantly: price drops inside a price-adjustment window, shipping fees on
+missed guaranteed delivery dates, late grocery deliveries. Each one is worth $5 to $50, and each one
+needs someone to notice, look up the rule, write the email and chase the reply. Nobody does that for a
+$22 air fryer, so the money stays with the store. That is exactly the kind of small, repetitive,
+judgment-light work an agent should do in the background.
+
+## What it does
+
+Refund Hunter reads your order confirmations and delivery notices, keeps a list of what you bought,
+and once a day checks every purchase that is still inside a store's window: current price versus what
+you paid, delivery date versus the promised date, against a policy table for each store. When it finds
+money it asks one question on the dashboard: "Target dropped your air fryer by $22, 9 days into their
+14-day window. File it?" Tap yes and it sends the claim with the order number, dates and the rule it
+relies on, logs it, and follows up if the store goes quiet for five days. If there is nothing to
+claim, you never hear from it.
+
+## How we built it
+
+Two Strands agents on Amazon Bedrock (Claude Sonnet 4.6). The Receipt Reader turns emails into
+purchase facts with structured output. The Hunter has five tools (list purchases, look up policy,
+check price, close purchase, file claim). `file_claim` raises a Strands interrupt: the agent stops
+mid-tool, the decision appears on the dashboard, and the session is saved (file locally, S3 on
+AgentCore) so a yes hours later resumes the same agent. When several claims are waiting, unanswered
+interrupts are answered "pending" and re-raised so each one waits for its own answer. State lives in
+DynamoDB, the agent runs on Amazon Bedrock AgentCore Runtime, EventBridge Scheduler wakes it once a
+day, and a FastAPI dashboard shows money found, claims, sent emails and the "needs you" queue.
+
+## Challenges
+
+Making the pause real: a background agent that asks a human and then resumes days later, not a chat
+that waits for the next message. Strands interrupts plus session managers made that work, once we
+worked out how to keep several open questions alive when the person answers only one.
+
+## Accomplishments
+
+An agent that does the full loop, read, decide, ask, send, follow up, on synthetic data that behaves
+like a real inbox, deployed on AgentCore with a daily schedule, in one day.
+
+## What we learned
+
+Interrupts are the right primitive for "surfaces only when there's a real decision". Tools that
+re-run on resume need deterministic ids. Policy knowledge belongs in an editable table, not in a
+prompt.
+
+## What's next
+
+Real store support addresses and chat-paste mode, credit-card price-protection benefits, airline
+delay compensation, and reading the store's reply to close the loop automatically.
+
+## Built with
+
+Python, Strands Agents SDK, Amazon Bedrock (Claude Sonnet 4.6), Amazon Bedrock AgentCore Runtime,
+DynamoDB, S3, EventBridge Scheduler, FastAPI.
