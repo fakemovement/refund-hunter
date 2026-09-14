@@ -13,9 +13,32 @@ from ..config import settings
 from ..models import OutboxMessage, State
 
 
+def _smtp_send(to: str, subject: str, body: str) -> None:
+    em = EmailMessage()
+    em["From"] = settings.smtp_user
+    em["To"] = to
+    em["Subject"] = subject
+    em.set_content(body)
+    with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=30) as s:
+        s.starttls()
+        s.login(settings.smtp_user, settings.smtp_password)
+        s.send_message(em)
+
+
+def send_notification(to: str, subject: str, body: str) -> bool:
+    """A digest email to the person (not a claim). Independent of the claim-sending toggle."""
+    if not (settings.smtp_ready and to):
+        return False
+    try:
+        _smtp_send(to, subject, body)
+        return True
+    except Exception:  # noqa: BLE001 - a failed notification is never fatal
+        return False
+
+
 def send_mail(state: State, to: str, subject: str, body: str, claim_id: str | None = None) -> OutboxMessage:
     msg = OutboxMessage(to=to, subject=subject, body=body, claim_id=claim_id)
-    if settings.smtp_ready:
+    if settings.send_claims and settings.smtp_ready:
         real_to = settings.claims_to_override or to
         try:
             em = EmailMessage()

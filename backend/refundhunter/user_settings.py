@@ -38,6 +38,9 @@ class UserSettings(BaseModel):
     smtp_user: str = ""
     smtp_password: str = ""
     safe_mode: bool = True  # send every claim to yourself instead of the store
+    # notifications
+    notify_by_email: bool = False
+    dashboard_url: str = "http://127.0.0.1:8000"
     # you
     owner_name: str = "Sam Rivera"
     owner_email: str = "sam.rivera.demo@example.com"
@@ -93,12 +96,14 @@ def from_env() -> UserSettings:
         imap_user=settings.imap_user or "",
         imap_password=settings.imap_password or "",
         imap_lookback_days=settings.imap_lookback_days,
-        send_emails=settings.smtp_ready,
+        send_emails=settings.send_claims and settings.smtp_ready,
         smtp_host=settings.smtp_host,
         smtp_port=settings.smtp_port,
         smtp_user=settings.smtp_user or "",
         smtp_password=settings.smtp_password or "",
         safe_mode=bool(settings.claims_to_override),
+        notify_by_email=settings.notify_by_email,
+        dashboard_url=settings.dashboard_url,
         owner_name=settings.owner_name,
         owner_email=settings.owner_email,
         followup_after_days=settings.followup_after_days,
@@ -120,7 +125,12 @@ def apply(us: UserSettings) -> None:
     settings.imap_user = us.imap_user or None
     settings.imap_password = us.imap_password or None
     settings.imap_lookback_days = us.imap_lookback_days
-    if us.send_emails:
+    # SMTP creds are needed to send claims OR to email notifications. A Gmail app password works
+    # for both IMAP and SMTP, so fall back to the inbox credentials.
+    settings.send_claims = us.send_emails
+    settings.notify_by_email = us.notify_by_email
+    settings.dashboard_url = us.dashboard_url or "http://127.0.0.1:8000"
+    if us.send_emails or us.notify_by_email:
         settings.smtp_host = us.smtp_host
         settings.smtp_port = us.smtp_port
         settings.smtp_user = us.smtp_user or us.imap_user or None

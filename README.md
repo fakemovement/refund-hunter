@@ -101,6 +101,10 @@ stored in `backend/.data/settings.json`, which is git-ignored and never leaves y
 
 Prefer environment variables? Copy `.env.example` to `.env`; the dashboard settings override it.
 
+**Get notified.** In Settings, turn on *Email me a digest when the agent finds refunds that need
+my yes*. When a run finds decisions, the agent emails you a short list and a link to the dashboard,
+sent from your own Gmail. You only hear from it when there's a decision, never otherwise.
+
 Command line, if you like it:
 
 ```bash
@@ -109,6 +113,29 @@ refundhunter decisions    # what is waiting for you
 refundhunter decide <interrupt id> approve
 refundhunter reset        # wipe the demo state
 ```
+
+## Two ways to run it
+
+**On your computer (private, simplest).** The steps above. Your inbox and keys never leave the
+machine. The catch: the daily background run only happens while the app is running, so this suits
+someone who leaves it open or runs `refundhunter run` on their own schedule.
+
+**On a server (runs 24/7 on its own).** With an AWS account you can deploy the whole thing so it
+wakes every morning whether or not your computer is on:
+
+```bash
+refundhunter create-table                       # DynamoDB state table
+aws s3 mb s3://refundhunter-sessions-<account>  # paused-agent sessions
+agentcore deploy --yes                          # the agents on Bedrock AgentCore
+python infra/schedule.py --runtime-arn <arn>    # the daily EventBridge schedule
+python infra/deploy_web.py                      # the dashboard on Lambda, prints a URL
+```
+
+Your Anthropic/OpenAI key, Gmail app password, and settings go into SSM Parameter Store
+(`/refundhunter/env`) rather than a laptop. This is the shape a real product would ship, minus the
+multi-user front door: today one deployment serves one person. **What's next** is a hosted,
+multi-user version with Google sign-in, so anyone could use it without deploying anything, and the
+agent would run for each person in the cloud on a schedule.
 
 ## Demo data
 

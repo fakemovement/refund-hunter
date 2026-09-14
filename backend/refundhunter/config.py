@@ -78,11 +78,18 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str | None = None
     smtp_password: str | None = None
+    # Whether approved claims are actually emailed. Off = they stay in the outbox (dry run).
+    send_claims: bool = True
     # Where claim emails really go. Leave empty to keep every outbound email in the outbox
     # (dry run) so a demo never emails a real store.
     claims_to_override: str | None = None
     owner_name: str = "Sam Rivera"
     owner_email: str = "sam.rivera.demo@example.com"
+
+    # --- notifications ---------------------------------------------------------
+    # Email the person a short digest when a run finds decisions waiting for them.
+    notify_by_email: bool = False
+    dashboard_url: str = "http://127.0.0.1:8000"
 
     # --- behaviour -------------------------------------------------------------
     followup_after_days: int = 5

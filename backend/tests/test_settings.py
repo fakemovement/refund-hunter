@@ -25,3 +25,16 @@ def test_settings_roundtrip_and_masking(tmp_path, monkeypatch):
     # applied to the live config
     assert settings.model_provider == "openai" and settings.mail_source == "imap"
     assert settings.claims_to_override == "me@gmail.com"
+
+
+def test_notify_uses_inbox_creds_and_gates(tmp_path, monkeypatch):
+    monkeypatch.setattr(settings, "data_dir", tmp_path)
+    # notify on, sending off: SMTP creds come from the Gmail inbox, claims still do not send
+    user_settings.save({"model_provider": "anthropic", "mail_source": "imap",
+                        "imap_user": "me@gmail.com", "imap_password": "apppw",
+                        "send_emails": False, "notify_by_email": True,
+                        "dashboard_url": "http://localhost:8000"})
+    assert settings.notify_by_email is True
+    assert settings.send_claims is False           # claims stay in the outbox
+    assert settings.smtp_ready is True             # but notifications can send
+    assert settings.smtp_user == "me@gmail.com" and settings.smtp_password == "apppw"

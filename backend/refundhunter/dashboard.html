@@ -122,7 +122,15 @@
     </fieldset>
 
     <fieldset>
-      <legend>4. You</legend>
+      <legend>4. Notify me</legend>
+      <label class="check"><input type="checkbox" name="notify_by_email"> Email me a digest when the agent finds refunds that need my yes</label>
+      <p class="help">Sent from your Gmail (needs a Gmail address + app password above). You only get an email when there's a decision, never otherwise.</p>
+      <label>Link to put in the email (where your dashboard lives)</label>
+      <input type="text" name="dashboard_url" placeholder="http://127.0.0.1:8000">
+    </fieldset>
+
+    <fieldset>
+      <legend>5. You</legend>
       <div class="two">
         <div><label>Your name (signs the emails)</label><input type="text" name="owner_name"></div>
         <div><label>Your email (reply address)</label><input type="email" name="owner_email"></div>

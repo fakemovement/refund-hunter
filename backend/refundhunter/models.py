@@ -91,6 +91,7 @@ class Decision(BaseModel):
     created_at: datetime = Field(default_factory=now)
     answered: str | None = None
     answered_at: datetime | None = None
+    notified: bool = False  # has the person been emailed about this one yet
 
 
 class OutboxMessage(BaseModel):

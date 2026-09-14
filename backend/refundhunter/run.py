@@ -52,6 +52,9 @@ async def run_daily(user_id: str = "local", trigger: str = "manual") -> RunRepor
     # 3. follow-ups on claims that went quiet
     report.followups_sent = _followups(state, log)
 
+    # 3b. tell the person, once, if new decisions are waiting
+    _notify(state, log)
+
     # 4. wrap up
     report.claims_filed = sum(1 for c in state.claims if c.filed_at and c.filed_at >= report.started_at)
     report.claims_proposed = report.claims_filed + report.decisions_waiting
@@ -179,6 +182,39 @@ def _absorb_resume(state: State, report: RunReport, result, session_id: str, bat
         report.summary = str(result).strip()[:600]
         report.decisions_waiting = 0
     report.log.append(report.summary)
+
+
+def _notify(state: State, log: list[str]) -> None:
+    """Email the person a short digest about decisions they have not been told about yet."""
+    if not settings.notify_by_email:
+        return
+    fresh = [d for d in state.pending_decisions() if not d.notified]
+    if not fresh:
+        return
+    lines, total = [], 0.0
+    for d in fresh:
+        c = state.claim(d.claim_id)
+        if not c:
+            continue
+        total += c.amount
+        p = state.purchase(c.purchase_id)
+        lines.append(f"  - {c.amount:>7.2f}  {p.merchant if p else '?'} — {c.kind.value.replace('_', ' ')} ({p.item if p else ''})")
+    body = (
+        f"Hi {settings.owner_name},\n\n"
+        f"Refund Hunter found {len(fresh)} refund(s) worth about ${total:.2f} that need your yes:\n\n"
+        + "\n".join(lines)
+        + f"\n\nApprove or skip each one here:\n{settings.dashboard_url}\n\n"
+        f"It won't send anything until you say so.\n\n— Refund Hunter"
+    )
+    from .mail import send_notification
+
+    ok = send_notification(settings.owner_email, f"{len(fresh)} refund(s) waiting for your yes", body)
+    if ok:
+        for d in fresh:
+            d.notified = True
+        log.append(f"notified {settings.owner_email} about {len(fresh)} decision(s)")
+    else:
+        log.append("notify skipped (no email configured or send failed)")
 
 
 def _followups(state: State, log: list[str]) -> int:
