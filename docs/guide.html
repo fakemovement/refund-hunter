@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Refund Hunter, the demo guide</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  body { font: 12.5pt/1.5 "Segoe UI", Helvetica, Arial, sans-serif; color: #1a1a1a; margin: 0; }
+  h1 { font-size: 28pt; margin: 0 0 4pt; }
+  .sub { color: #555; font-size: 13pt; margin: 0 0 16pt; }
+  h2 { font-size: 18pt; margin: 22pt 0 8pt; padding-top: 6pt; border-top: 2px solid #eee; }
+  h3 { font-size: 13.5pt; margin: 14pt 0 4pt; }
+  p { margin: 0 0 8pt; }
+  ol, ul { margin: 0 0 8pt 18pt; padding: 0; }
+  li { margin-bottom: 4pt; }
+  code, pre { font-family: Consolas, Menlo, monospace; font-size: 11pt; }
+  pre { background: #111; color: #eee; padding: 8pt 10pt; border-radius: 6pt; white-space: pre-wrap; }
+  .say { background: #f3f7fc; border-left: 4px solid #0f5fd6; padding: 8pt 12pt; border-radius: 5pt; margin: 6pt 0 10pt; font-style: italic; }
+  .say b { font-style: normal; color: #0f5fd6; }
+  .do { background: #fff7e6; border-left: 4px solid #e0a020; padding: 8pt 12pt; border-radius: 5pt; margin: 6pt 0 10pt; }
+  .do b { color: #a86a00; }
+  .tip { background: #e9f7ee; border-left: 4px solid #137a4b; padding: 8pt 12pt; border-radius: 5pt; margin: 6pt 0 10pt; }
+  img { max-width: 100%; border: 1px solid #ddd; border-radius: 6pt; margin: 4pt 0 10pt; }
+  .pagebreak { page-break-before: always; }
+  .flow { display: flex; gap: 6pt; margin: 8pt 0 12pt; }
+  .flow .box { flex: 1; border: 1.5px solid #333; border-radius: 8pt; padding: 7pt 6pt; text-align: center; font-size: 10.5pt; }
+  .flow .box small { display: block; color: #666; font-size: 9.5pt; }
+  .flow .arrow { align-self: center; font-size: 16pt; color: #666; }
+  .flow .agent { background: #e8f1ff; border-color: #0f5fd6; }
+  .flow .pause { background: #fff7e6; border-color: #c77d00; }
+  table { border-collapse: collapse; width: 100%; font-size: 11.5pt; margin: 4pt 0 10pt; }
+  th, td { text-align: left; padding: 5pt 7pt; border-bottom: 1px solid #e3e3e3; vertical-align: top; }
+  th { font-size: 10pt; color: #666; text-transform: uppercase; letter-spacing: .05em; }
+  .time { display: inline-block; background: #eee; border-radius: 4pt; padding: 0 6pt; font-size: 10.5pt; color: #333; margin-right: 6pt; }
+</style>
+</head>
+<body>
+
+<h1>Refund Hunter: the demo guide</h1>
+<p class="sub">Everything you need to set it up, understand it, record the video, and submit. Step by step, with the screens you will see.</p>
+
+<h2>1. How it works, in one minute</h2>
+<p>Refund Hunter is an agent that reads your order emails, finds the refunds stores owe you (price drops inside a price-adjustment window, late deliveries), and files the claim after you tap <b>Yes</b>. If it finds nothing, you never hear from it.</p>
+
+<div class="flow">
+  <div class="box">Inbox<small>order &amp; delivery emails</small></div>
+  <div class="arrow">→</div>
+  <div class="box agent">Receipt Reader<small>emails → purchase list</small></div>
+  <div class="arrow">→</div>
+  <div class="box agent">Hunter<small>rules · today's price · dates</small></div>
+  <div class="arrow">→</div>
+  <div class="box pause">Pause<small>"File $22?" Yes / Skip</small></div>
+  <div class="arrow">→</div>
+  <div class="box">Claim email<small>to the store</small></div>
+</div>
+
+<ul>
+  <li><b>Two agents</b>, built with the Strands Agents SDK, run on Claude (Amazon Bedrock).</li>
+  <li><b>The Hunter has five tools.</b> One of them, <code>file_claim</code>, stops the agent with a Strands <b>interrupt</b> and waits for your answer. Your answer resumes the exact same agent, even hours later, because the session is saved.</li>
+  <li><b>It runs by itself once a day</b> on Amazon Bedrock AgentCore, woken by an EventBridge schedule. Memory is in DynamoDB, paused sessions in S3.</li>
+  <li><b>The demo inbox is fake.</b> A made-up person, made-up orders. No SMTP is configured, so claim emails stay in the "Emails the agent sent" list instead of going to a real store.</li>
+</ul>
+
+<h2>2. Setup (already done on this PC)</h2>
+<p>Everything is installed. You only need to start the dashboard. Open a terminal (PowerShell) and run:</p>
+<pre>cd "C:\Users\jonat\Desktop\AWS competition\refund-hunter\backend"
+.venv\Scripts\refundhunter serve</pre>
+<p>Then open <b>http://127.0.0.1:8000</b> in Chrome. Leave the terminal open while you record.</p>
+
+<div class="tip"><b>Fresh start:</b> press <b>Reset demo</b> in the dashboard (top right) before recording. It wipes purchases, claims, and answers.</div>
+
+<p>Useful commands, if you ever want them:</p>
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>refundhunter run</code></td><td>Same as the "Run today's check" button, in the terminal</td></tr>
+  <tr><td><code>refundhunter decisions</code></td><td>Lists the questions waiting for you</td></tr>
+  <tr><td><code>refundhunter reset</code></td><td>Wipes the demo state</td></tr>
+</table>
+
+<p><b>On a new computer</b> (not needed today): install <code>uv</code>, then in <code>backend/</code> run
+<code>uv venv .venv --python 3.12</code>, <code>uv pip install -e ".[dev]" "strands-agents[anthropic]"</code>, copy
+<code>.env.example</code> to <code>.env</code>, and make sure AWS credentials with Bedrock access are configured.</p>
+
+<div class="pagebreak"></div>
+
+<h2>3. The demo, screen by screen</h2>
+<p>Record your screen at 1280 px wide or more. Total target: <b>4 min 30 s</b>. The gray time stamps are where you should be.</p>
+
+<h3><span class="time">0:00</span> Slide or talking head: the problem</h3>
+<div class="say"><b>Say:</b> "Stores owe you money more often than you think. Target refunds the difference if their price drops within 14 days of your order. Costco gives you 30 days. Amazon refunds the shipping you paid when it misses a guaranteed delivery date. Almost nobody collects it, because for $22 you'd have to notice, know the rule, find the order number, write the email, and chase the reply. So the money stays with the store."</div>
+
+<h3><span class="time">0:40</span> Who it's for</h3>
+<div class="say"><b>Say:</b> "Refund Hunter is for anyone who shops online. It reads your receipts, checks every store's rules and prices in the background, and asks you exactly one question when it finds money. If there's nothing to claim, you never hear from it. Built with the Strands Agents SDK, running on Amazon Bedrock AgentCore."</div>
+
+<h3><span class="time">1:10</span> Screen 1: the empty dashboard</h3>
+<div class="do"><b>Do:</b> show the dashboard after Reset. Point at the four tiles and the empty "Needs you" box.</div>
+<img src="guide/01-empty.png" alt="Empty dashboard">
+<div class="say"><b>Say:</b> "This is Sam's dashboard. Nothing yet. Sam's inbox has a dozen emails from the last three weeks: orders from Target, Costco, Amazon, Best Buy, Walmart, Home Depot, an Instacart delivery, a newsletter, and a note from a friend."</div>
+<div class="tip">Optional: show <code>backend/fixtures/inbox.json</code> for five seconds so people see the emails are made up.</div>
+
+<div class="pagebreak"></div>
+
+<h3><span class="time">1:30</span> Screen 2: press "Run today's check"</h3>
+<div class="do"><b>Do:</b> press the black button. It takes 30 to 45 seconds. Keep talking while it works.</div>
+<div class="say"><b>Say:</b> "The first agent, the Receipt Reader, turns those emails into a list of purchases: what, where, how much, when it was promised. The second agent, the Hunter, looks up each store's policy, checks today's price, compares delivery dates, and decides."</div>
+<img src="guide/02-after-run.png" alt="After the run: questions waiting">
+<div class="say"><b>Say:</b> "Seven purchases. Best Buy is closed: 20 days old, outside the 15-day window. Walmart is closed: no price adjustment, delivered on time. And up here, the agent has four questions for me. It didn't send anything. Costco dropped my vacuum by $50, 12 days into a 30-day window. Target dropped the air fryer by $22. Amazon delivered two days after the guaranteed date, and I paid $12.99 for shipping. Instacart delivered an hour and 48 minutes after the window."</div>
+<div class="tip">Sometimes the questions arrive in two waves: a couple right after the run, the rest after you answer the first one. That is normal, and it looks good on video: "it found more."</div>
+
+<div class="pagebreak"></div>
+
+<h3><span class="time">2:20</span> Screen 3: tap "Yes, file it"</h3>
+<div class="do"><b>Do:</b> tap <b>Yes, file it</b> on the Costco question ($50). Wait about 5 seconds. Scroll down to "Emails the agent sent" and open the email.</div>
+<div class="say"><b>Say:</b> "This is the part that matters. Filing a claim is a Strands interrupt: the agent stopped in the middle of its job and waited for me. Now it resumes, writes the email with the order number, the dates, the rule it relies on, and the amount, and sends it."</div>
+<img src="guide/03-after-approve.png" alt="After approving: claim filed and the email">
+
+<h3><span class="time">3:00</span> Screen 4: skip one, approve the rest</h3>
+<div class="do"><b>Do:</b> tap <b>Skip</b> on Target ($22). Tap <b>Yes</b> on Amazon ($12.99) and Instacart ($5). Point at the tiles at the top.</div>
+<div class="say"><b>Say:</b> "Maybe I don't want to bother Target for $22. Skip. Remembered, no email. Amazon, two days late on a guaranteed date: yes, shipping refunded. Instacart: yes. Money found, claims filed. Every email is here, and I can read it."</div>
+<img src="guide/04-final.png" alt="Final state: money found and claims filed">
+
+<div class="pagebreak"></div>
+
+<h3><span class="time">3:40</span> Background and follow-up</h3>
+<div class="say"><b>Say:</b> "Every morning at eight, EventBridge wakes the agent on AgentCore. New receipts get read, prices get re-checked while purchases are still inside their windows, and any claim the store hasn't answered in five days gets one polite follow-up. I only see this page when there's a decision."</div>
+<div class="do"><b>Do:</b> show the AWS console for 10 seconds: Amazon Bedrock → AgentCore → Runtimes → <b>RefundHunter_Hunter</b> (status READY). If you have time, EventBridge Scheduler → <b>refundhunter-daily</b>.</div>
+
+<h3><span class="time">4:00</span> Architecture</h3>
+<div class="do"><b>Do:</b> show <code>docs/architecture.png</code> full screen.</div>
+<img src="architecture.png" alt="Architecture">
+<div class="say"><b>Say:</b> "Two Strands agents. The Reader uses structured output. The Hunter has five tools, and one of them raises the interrupt. State in DynamoDB, the paused agent in S3, Claude on Bedrock, EventBridge for the schedule. Everything in the demo is synthetic, and the same code reads a real Gmail inbox over IMAP."</div>
+
+<h3><span class="time">4:30</span> Close</h3>
+<div class="say"><b>Say:</b> "Refund Hunter: the agent that collects the small money you're owed, and only talks to you when it needs a yes. It's open source, MIT, on GitHub."</div>
+
+<h2>4. Recording tips</h2>
+<ul>
+  <li>Use a clean Chrome window: no bookmarks bar, no other tabs visible. Zoom 100%.</li>
+  <li>Do one full dry run first, then Reset demo and record.</li>
+  <li>If the run takes long, cut the wait in editing. Judges want under 5 minutes.</li>
+  <li>Windows: <b>Win + Alt + R</b> records the screen (Xbox Game Bar), or use OBS.</li>
+  <li>Upload to YouTube as <b>Public</b>. Title: "Refund Hunter - Agents for Humans Hackathon (Strands Agents + AgentCore)".</li>
+</ul>
+
+<h2>5. Submit on Devpost</h2>
+<ol>
+  <li>Go to https://agentsforhumans.devpost.com and start a submission.</li>
+  <li>Project name <b>Refund Hunter</b>. Track <b>Everyday Agents</b>.</li>
+  <li>Description: copy the text from <code>docs/devpost.md</code>.</li>
+  <li>Repo: <b>https://github.com/fakemovement/refund-hunter</b> (public, MIT shown in About).</li>
+  <li>Video: your YouTube link.</li>
+  <li>Images: upload <code>docs/architecture.png</code> and <code>docs/dashboard.png</code>.</li>
+  <li>AWS Builder ID email: yours.</li>
+  <li>Pre-existing code: "Deployment scaffold (AgentCore CDK project) reused from an earlier project of mine; all agent code written during the submission period."</li>
+  <li>Submit before <b>1 PM</b> Pacific. The hard deadline is 5 PM.</li>
+</ol>
+
+</body>
+</html>

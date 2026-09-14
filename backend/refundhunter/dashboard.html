@@ -148,7 +148,7 @@ $('#run').onclick = async () => { if(busy) return; setBusy(true,'Reading mail an
 $('#reset').onclick = async () => { if(busy) return; if(!confirm('Wipe the demo state?')) return; await post('/api/reset'); setBusy(false,'Reset'); load(); };
 window.decide = async (id, answer) => { if(busy) return; setBusy(true, answer==='approve'?'Filing the claim…':'Skipping…'); try{ const r = await post('/api/decide',{interrupt_id:id, answer}); setBusy(false, r.summary||'Done'); }catch(e){ setBusy(false,'Error: '+e.message); } load(); };
 window.resolve = async (id, outcome) => { await post('/api/resolve',{claim_id:id, outcome}); load(); };
-load();
+load().then(() => { if (location.hash === '#open') document.querySelectorAll('details').forEach(d => d.open = true); });
 </script>
 </body>
 </html>

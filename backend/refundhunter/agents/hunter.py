@@ -245,11 +245,21 @@ def _claim_email(p: Purchase, c: Claim) -> tuple[str, str]:
         )
     else:
         subject = f"Late delivery refund request, order {p.order_id}"
+        if p.notes and "scheduled window" in p.notes and "closed:" not in p.notes:
+            timing = (
+                f"was scheduled for a delivery window on "
+                f"{p.delivered_on.strftime('%B %d, %Y') if p.delivered_on else 'the promised day'} "
+                f"({p.notes.split('|')[0].strip()})"
+            )
+        else:
+            timing = (
+                f"had a promised delivery date of "
+                f"{p.promised_delivery.strftime('%B %d, %Y') if p.promised_delivery else 'the scheduled window'} "
+                f"and arrived on {p.delivered_on.strftime('%B %d, %Y') if p.delivered_on else 'a later date'}"
+            )
         body = (
             f"Hello {p.merchant} team,\n\n"
-            f"My order {p.order_id} ({p.item}) had a promised delivery of "
-            f"{p.promised_delivery.strftime('%B %d, %Y') if p.promised_delivery else 'the scheduled window'} "
-            f"and arrived {p.delivered_on.strftime('%B %d, %Y') if p.delivered_on else 'late'}.\n\n{c.policy}\n\n"
+            f"My order {p.order_id} ({p.item}) {timing}.\n\n{c.policy}\n\n"
             f"Could you please refund ${c.amount:.2f} to my original payment method?\n\n"
             f"Thank you,\n{owner}\n{settings.owner_email}"
         )
