@@ -48,10 +48,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="RH_", env_file=".env", extra="ignore")
 
     # --- model ---------------------------------------------------------------
-    model_provider: str = "bedrock"  # bedrock | anthropic
+    # bedrock (deployed runtime) | anthropic | openai (both offered in the dashboard)
+    model_provider: str = "bedrock"
     bedrock_model_id: str = "global.anthropic.claude-sonnet-4-6"
     aws_region: str = "us-east-1"
     anthropic_model_id: str = "claude-sonnet-4-6"
+    openai_model_id: str = "gpt-4.1"
     model_max_tokens: int = 4000
 
     # --- storage -------------------------------------------------------------

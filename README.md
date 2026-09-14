@@ -55,7 +55,7 @@ inbox ──► Receipt Reader ──► purchases ──► Hunter ──► cl
 | Human decision | `tool_context.interrupt(...)` inside `file_claim`; `AgentResult.stop_reason == "interrupt"`; resume with `interruptResponse` |
 | Multi-day pause | `FileSessionManager` locally, `S3SessionManager` on AgentCore, so a "yes" hours later resumes the same agent |
 | Several claims at once | unanswered interrupts are answered `pending` and re-raised, so each claim waits for its own answer |
-| Model | Claude Sonnet 4.6 on Amazon Bedrock (`BedrockModel`); `AnthropicModel` as a dev fallback |
+| Model | Pluggable: `AnthropicModel` (Claude) or `OpenAIModel` (ChatGPT) when you run it yourself; `BedrockModel` (Claude Sonnet 4.6) on the deployed runtime |
 
 ## Architecture
 
@@ -86,8 +86,7 @@ uv pip install -e ".[dev]" "strands-agents[anthropic]"
 
 Open **http://127.0.0.1:8000** and click **⚙ Settings**. The form asks for four things:
 
-1. **The AI.** Paste an Anthropic API key, or pick AWS Bedrock if you have AWS credentials with
-   Claude access on this machine.
+1. **The AI.** Paste a Claude (Anthropic) API key, or a ChatGPT (OpenAI) API key.
 2. **Your inbox.** Keep the demo inbox to try it, or choose *My Gmail* and enter your address and a
    Gmail [App Password](https://myaccount.google.com/apppasswords) (2-Step Verification must be on).
    Refund Hunter only reads mail; it never deletes or moves anything.

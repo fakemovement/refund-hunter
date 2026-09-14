@@ -84,20 +84,18 @@
     <fieldset>
       <legend>1. The AI that reads and decides</legend>
       <div class="choice">
-        <label><input type="radio" name="model_provider" value="anthropic"> Anthropic API key</label>
-        <label><input type="radio" name="model_provider" value="bedrock"> AWS Bedrock (uses your AWS login)</label>
+        <label><input type="radio" name="model_provider" value="anthropic"> Claude (Anthropic)</label>
+        <label><input type="radio" name="model_provider" value="openai"> ChatGPT (OpenAI)</label>
       </div>
       <div id="anthropic-fields">
         <label>Anthropic API key</label>
         <input type="password" name="anthropic_api_key" placeholder="sk-ant-…" autocomplete="off">
         <p class="help">Get one at <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Pay as you go; one daily run costs a few cents.</p>
       </div>
-      <div id="bedrock-fields">
-        <div class="two">
-          <div><label>AWS region</label><input type="text" name="aws_region" placeholder="us-east-1"></div>
-          <div><label>Bedrock model id</label><input type="text" name="bedrock_model_id" placeholder="global.anthropic.claude-sonnet-4-6"></div>
-        </div>
-        <p class="help">Needs AWS credentials on this computer (<code>aws configure</code>) with access to Claude on Bedrock.</p>
+      <div id="openai-fields">
+        <label>OpenAI API key</label>
+        <input type="password" name="openai_api_key" placeholder="sk-…" autocomplete="off">
+        <p class="help">Get one at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a>. Pay as you go; one daily run costs a few cents.</p>
       </div>
     </fieldset>
 
@@ -283,7 +281,7 @@ function readForm(){
 function toggleFields(){
   const d = readForm();
   $('#anthropic-fields').hidden = d.model_provider !== 'anthropic';
-  $('#bedrock-fields').hidden = d.model_provider !== 'bedrock';
+  $('#openai-fields').hidden = d.model_provider !== 'openai';
   $('#imap-fields').hidden = d.mail_source !== 'imap';
 }
 form.addEventListener('change', toggleFields);

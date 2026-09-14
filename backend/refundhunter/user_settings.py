@@ -15,16 +15,16 @@ from pydantic import BaseModel
 
 from .config import settings
 
-SECRET_FIELDS = ("anthropic_api_key", "imap_password", "smtp_password")
+SECRET_FIELDS = ("anthropic_api_key", "openai_api_key", "imap_password", "smtp_password")
 
 
 class UserSettings(BaseModel):
-    # model
-    model_provider: str = "bedrock"  # bedrock | anthropic
+    # model: the dashboard offers "anthropic" (Claude) or "openai" (ChatGPT)
+    model_provider: str = "anthropic"
     anthropic_api_key: str = ""
     anthropic_model_id: str = "claude-sonnet-4-6"
-    bedrock_model_id: str = "global.anthropic.claude-sonnet-4-6"
-    aws_region: str = "us-east-1"
+    openai_api_key: str = ""
+    openai_model_id: str = "gpt-4.1"
     # inbox
     mail_source: str = "fixtures"  # fixtures | imap
     imap_host: str = "imap.gmail.com"
@@ -79,12 +79,15 @@ def save(new: dict) -> UserSettings:
 
 def from_env() -> UserSettings:
     """What the environment (.env) says, as a starting point for the form."""
+    # The dashboard only offers Anthropic or OpenAI; if the env says bedrock, default the form
+    # to Anthropic so a person sees a key field they can fill.
+    provider = settings.model_provider if settings.model_provider in ("anthropic", "openai") else "anthropic"
     return UserSettings(
-        model_provider=settings.model_provider,
+        model_provider=provider,
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY", ""),
         anthropic_model_id=settings.anthropic_model_id,
-        bedrock_model_id=settings.bedrock_model_id,
-        aws_region=settings.aws_region,
+        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+        openai_model_id=settings.openai_model_id,
         mail_source=settings.mail_source,
         imap_host=settings.imap_host,
         imap_user=settings.imap_user or "",
@@ -107,10 +110,11 @@ def apply(us: UserSettings) -> None:
     """Push the saved settings into the live config so the next run uses them."""
     settings.model_provider = us.model_provider
     settings.anthropic_model_id = us.anthropic_model_id
-    settings.bedrock_model_id = us.bedrock_model_id
-    settings.aws_region = us.aws_region
+    settings.openai_model_id = us.openai_model_id
     if us.anthropic_api_key:
         os.environ["ANTHROPIC_API_KEY"] = us.anthropic_api_key
+    if us.openai_api_key:
+        os.environ["OPENAI_API_KEY"] = us.openai_api_key
     settings.mail_source = us.mail_source
     settings.imap_host = us.imap_host
     settings.imap_user = us.imap_user or None

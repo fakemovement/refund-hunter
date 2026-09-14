@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
 dependencies = [
-    "strands-agents>=1.0",
+    "strands-agents[anthropic,openai]>=1.0",
     "strands-agents-tools>=0.2",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
