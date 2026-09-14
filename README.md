@@ -18,6 +18,8 @@ follows up if the store goes quiet. If there is nothing to claim, you never hear
 > **Everyday Agents**, with the [Strands Agents SDK](https://strandsagents.com/) on Amazon Bedrock
 > AgentCore.
 
+![dashboard](docs/dashboard.png)
+
 ## What the agent does, end to end
 
 ```
@@ -99,7 +101,8 @@ always lands inside the stores' windows. It contains:
 | Amazon LEGO set, $12.99 one-day shipping, delivered 2 days after the guaranteed date | late delivery → propose **$12.99** shipping refund |
 | Best Buy headphones, 20 days ago | outside the 15-day window → close, no claim |
 | Walmart pressure cooker, delivered on time | no price-adjustment policy, on time → close |
-| Home Depot drill, price unchanged | keep watching |
+| Home Depot drill, price unchanged, 16 days into a 30-day window | keep watching |
+| Instacart groceries delivered 1 h 48 min after the window | late delivery → propose the **$5.00** credit |
 | A newsletter and a note from a friend | ignore |
 
 `refundhunter reset` (or the dashboard's *Reset demo*) wipes the state for a fresh run.

@@ -23,7 +23,9 @@ promised or guaranteed delivery date if stated).
 For each SHIPPING notice: report the promised/estimated delivery date for the order if given.
 For each DELIVERY notice: report the order id and the date it was actually delivered. For grocery
 or restaurant deliveries with a scheduled window, also report the scheduled window end time and the
-actual delivery time.
+actual delivery time. A grocery or food delivery receipt that lists items, fees and a total counts
+as BOTH an order confirmation (one purchase: item = "<store> grocery order, N items", price = the
+items subtotal, shipping_fee = the delivery fee, order_date = delivery date) AND a delivery notice.
 Ignore newsletters, marketing, personal messages, and anything that is not about a specific order.
 Never invent an order id, price, or date: leave a field empty when the email does not state it.
 Today's date is given in the prompt; resolve month-day dates against it (they are recent, never in
@@ -115,11 +117,13 @@ def apply(state: State, extraction: Extraction, log: list[str]) -> int:
                 p.promised_delivery = d.promised_delivery
             if d.delivered_on:
                 p.delivered_on = d.delivered_on
-            if d.scheduled_window_end or d.delivered_at_time:
+            if d.scheduled_window_end and d.delivered_at_time:
                 p.notes = (
-                    f"scheduled window end {d.scheduled_window_end or '?'}; "
-                    f"delivered at {d.delivered_at_time or '?'}"
+                    f"scheduled window ended {d.scheduled_window_end}; "
+                    f"delivered at {d.delivered_at_time}"
                 )
+                if not p.promised_delivery and d.delivered_on:
+                    p.promised_delivery = d.delivered_on
             if d.source_email_id not in p.source_email_ids:
                 p.source_email_ids.append(d.source_email_id)
             log.append(f"delivery: {p.merchant} order {p.order_id} -> {p.delivered_on} {p.notes}")
