@@ -7,26 +7,30 @@ import json, os, subprocess, sys, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # ReelEngine
 VOICE = "TABZn6CDfjMNGrsnGzzD"      # WikiBrad - Fast & Informative (same as the reels)
-MODEL = "eleven_v3"
-SETTINGS = {"stability": 0.5, "similarity_boost": 0.75, "style": 0.4, "speed": 1.0}
+MODEL = "eleven_multilingual_v2"   # steadier and more natural than v3, far fewer dramatic pauses
+SETTINGS = {"stability": 0.55, "similarity_boost": 0.8, "style": 0.28, "speed": 1.0}
 FFPROBE = r"C:\Users\jonat\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffprobe.exe"
 
+# Conversational, plain sentences. No em-dashes or colons, which is what made the
+# earlier take stop and "perform" mid-line. Numbers are spelled the way a person
+# would say them so the voice reads them naturally.
 SCENES = [
-    ("hook",      "Target, Costco, Amazon: they all owe refunds. Price drops, late deliveries, missed guarantees."),
-    ("example",   "You buy an air fryer for 129 dollars. Nine days later it drops to 108. Target's own rule says you get the 22 back."),
-    ("chore",     "But you'd have to notice, look up the rule, find the order number, write the email, and chase the reply. So nobody does."),
-    ("meet",      "Refund Hunter is an agent that does all of it for you. It's for anyone who shops online."),
-    ("flow",      "Every day it reads your receipts, checks each store's rules and today's prices, and when it finds money, it asks you."),
-    ("run",       "Here it is. One press reads a dozen receipts and checks every store. Best Buy's too late; Walmart was on time."),
-    ("ask",       "It found four refunds worth almost 90 dollars. It sent nothing. It asks you one plain question for each."),
-    ("approve",   "Tap yes, and it writes the claim with the order number and the store's rule, then sends it. Tap skip, and nothing happens."),
-    ("interrupt", "That pause is the whole idea. The agent stops mid-task and waits for you, for hours or days, then picks up exactly where it left off."),
-    ("settings",  "Bring your own Claude or ChatGPT key, connect your Gmail, and it can email you the moment something needs a yes."),
-    ("aws",       "Under the hood: two agents on the Strands SDK, running on Amazon Bedrock AgentCore, woken every morning on their own."),
-    ("close",     "Refund Hunter. It collects the small money you're owed, and only talks to you when it needs a yes."),
+    ("hook",      "Stores owe you money all the time. Price drops, late deliveries, missed delivery dates. And almost nobody ever collects it."),
+    ("example",   "Say you buy an air fryer for a hundred and thirty dollars. A week later, Target quietly drops it to a hundred and eight. Their own policy means you're owed that difference back."),
+    ("chore",     "But to actually get it, you'd have to spot the drop, know the rule, find the order number, write the email, and chase a reply. So most of us just let it go."),
+    ("meet",      "Refund Hunter does that whole chore for you. It's a simple background agent for anyone who shops online."),
+    ("flow",      "Once a day it reads your receipts, works out what each store actually owes you, and the moment it finds real money, it comes to you."),
+    ("run",       "Here it is. You press one button, it reads a dozen receipts and checks every store, and in seconds it's found four refunds worth about ninety dollars."),
+    ("ask",       "It hasn't sent anything yet. For each one, it just asks you a plain question. Costco dropped fifty dollars, and you're still inside their thirty day window."),
+    ("approve",   "You tap yes, and it writes the claim with your order number and Costco's own rule, and files it for you."),
+    ("email",     "Here's the actual email it sent. Everything the store needs, and nothing you had to type yourself."),
+    ("interrupt", "That pause is really the whole point. The agent stops and waits for you, even for days, then picks right up where it left off."),
+    ("settings",  "You bring your own Claude or ChatGPT key, connect your Gmail, and it can email you the moment something needs a yes."),
+    ("aws",       "Behind the scenes, two agents built on the Strands SDK run on Amazon Bedrock, waking up on their own every single morning."),
+    ("close",     "That's Refund Hunter. It quietly collects the money you're owed, and only speaks up when it really needs you."),
 ]
 
-TAIL = 0.7   # seconds of silence held after the voice in each scene
+TAIL = 0.55   # seconds of quiet held after the voice in each scene
 
 
 def env(key):

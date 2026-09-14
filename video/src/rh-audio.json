@@ -1,76 +1,82 @@
 {
-  "total": 83.6,
+  "total": 76.16,
   "scenes": [
     {
       "id": "hook",
-      "voice": 5.52,
-      "dur": 6.22,
+      "voice": 5.39,
+      "dur": 5.94,
       "audio": "rh/voice/hook.mp3"
     },
     {
       "id": "example",
-      "voice": 7.84,
-      "dur": 8.54,
+      "voice": 6.87,
+      "dur": 7.42,
       "audio": "rh/voice/example.mp3"
     },
     {
       "id": "chore",
-      "voice": 6.48,
-      "dur": 7.18,
+      "voice": 6.32,
+      "dur": 6.87,
       "audio": "rh/voice/chore.mp3"
     },
     {
       "id": "meet",
-      "voice": 4.8,
-      "dur": 5.5,
+      "voice": 4.5,
+      "dur": 5.05,
       "audio": "rh/voice/meet.mp3"
     },
     {
       "id": "flow",
-      "voice": 5.6,
-      "dur": 6.3,
+      "voice": 5.06,
+      "dur": 5.61,
       "audio": "rh/voice/flow.mp3"
     },
     {
       "id": "run",
-      "voice": 6.16,
-      "dur": 6.86,
+      "voice": 6.04,
+      "dur": 6.59,
       "audio": "rh/voice/run.mp3"
     },
     {
       "id": "ask",
-      "voice": 6.64,
-      "dur": 7.34,
+      "voice": 6.13,
+      "dur": 6.68,
       "audio": "rh/voice/ask.mp3"
     },
     {
       "id": "approve",
-      "voice": 6.72,
-      "dur": 7.42,
+      "voice": 4.32,
+      "dur": 4.87,
       "audio": "rh/voice/approve.mp3"
     },
     {
+      "id": "email",
+      "voice": 3.9,
+      "dur": 4.45,
+      "audio": "rh/voice/email.mp3"
+    },
+    {
       "id": "interrupt",
-      "voice": 8.64,
-      "dur": 9.34,
+      "voice": 5.29,
+      "dur": 5.84,
       "audio": "rh/voice/interrupt.mp3"
     },
     {
       "id": "settings",
-      "voice": 5.68,
-      "dur": 6.38,
+      "voice": 4.88,
+      "dur": 5.43,
       "audio": "rh/voice/settings.mp3"
     },
     {
       "id": "aws",
-      "voice": 6.4,
-      "dur": 7.1,
+      "voice": 5.94,
+      "dur": 6.49,
       "audio": "rh/voice/aws.mp3"
     },
     {
       "id": "close",
-      "voice": 4.72,
-      "dur": 5.42,
+      "voice": 4.37,
+      "dur": 4.92,
       "audio": "rh/voice/close.mp3"
     }
   ]
