@@ -1,6 +1,6 @@
 # Refund Hunter — explainer video (Remotion)
 
-The landscape (1920x1080) YouTube explainer, in the Agent Memo "story-scene on
+The landscape (1920x1080) YouTube explainer, in a "story-scene on
 cream paper" style. Self-timed: the on-screen captions carry the narration, so
 no recorded voiceover is needed. Real product screenshots (in `public/rh/`) are
 shown as taped photos so the video demonstrates the working product.

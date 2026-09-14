@@ -1,11 +1,11 @@
 """Generate one ElevenLabs voice clip per scene for the Refund Hunter explainer,
 measure each clip, and write rh-audio.json (per-scene audio path + duration).
 
-Run from ReelEngine/video:  python gen-rh-voice.py
+Run from the video/ folder:  python gen-rh-voice.py (needs ELEVENLABS_API_KEY in a .env)
 """
 import json, os, subprocess, sys, urllib.request, urllib.error
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # ReelEngine
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # project root (looks for .env here)
 VOICE = "TABZn6CDfjMNGrsnGzzD"      # WikiBrad - Fast & Informative (same as the reels)
 MODEL = "eleven_multilingual_v2"   # steadier and more natural than v3, far fewer dramatic pauses
 # A touch slower and steadier so it doesn't rush, and low style so it stops "performing".

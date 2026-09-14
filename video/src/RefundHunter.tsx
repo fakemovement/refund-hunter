@@ -1,6 +1,6 @@
 // RefundHunter — landscape (1920x1080) explainer for the AWS Agents for Humans hackathon.
 //
-// Same "story-scene on cream paper" language as the Agent Memo reels (paper, dot
+// A "story-scene on cream paper" style (paper, dot
 // grid, kinetic Fraunces captions, red accent, grain + vignette, progress bar,
 // closing lockup) but landscape and WITHOUT the roaming robot. A natural
 // ElevenLabs voiceover (one take per scene, rh-audio.json) drives the timing,
