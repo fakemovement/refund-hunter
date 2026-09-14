@@ -22,7 +22,6 @@
         { "name": "RH_STORE", "value": "dynamodb" },
         { "name": "RH_DDB_TABLE", "value": "refundhunter" },
         { "name": "RH_SESSION_BACKEND", "value": "s3" },
-        { "name": "RH_SESSION_BUCKET", "value": "refundhunter-sessions-253184024603" },
         { "name": "RH_DATA_DIR", "value": "/tmp/refundhunter" },
         { "name": "RH_SSM_PARAM", "value": "/refundhunter/env" },
         { "name": "RH_MODEL_PROVIDER", "value": "bedrock" },

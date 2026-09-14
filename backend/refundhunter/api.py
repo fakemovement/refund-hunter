@@ -18,9 +18,12 @@ from .config import settings
 from .models import State
 from .store import get_store
 
+from . import user_settings
+
 app = FastAPI(title="Refund Hunter", version=__version__, docs_url="/api/docs", redoc_url=None)
 _STATIC = Path(__file__).with_name("dashboard.html")
 _lock = asyncio.Lock()
+user_settings.apply_saved()  # settings entered in the dashboard win over .env
 
 
 def _view(state: State) -> dict:
@@ -56,6 +59,9 @@ def _view(state: State) -> dict:
         "mode": "agentcore" if settings.agent_runtime_arn else "local",
         "mail_source": settings.mail_source,
         "smtp": settings.smtp_ready,
+        "safe_mode": bool(settings.claims_to_override),
+        "model_provider": settings.model_provider,
+        "configured": user_settings.load() is not None,
         "running": state.is_running(),
         "purchases": [p.model_dump(mode="json") for p in sorted(state.purchases, key=lambda p: p.order_date, reverse=True)],
         "claims": claims,
@@ -182,6 +188,37 @@ async def api_reset(user_id: str = "local"):
 
             shutil.rmtree(sessions, ignore_errors=True)
     return {"ok": True}
+
+
+# ---- settings (local mode only: the hosted demo has nothing to configure) -------------------
+
+
+def _local_only():
+    if settings.agent_runtime_arn:
+        raise HTTPException(status_code=400, detail="Settings are only available when you run Refund Hunter yourself.")
+
+
+@app.get("/api/settings")
+async def api_settings_get():
+    _local_only()
+    return user_settings.masked(user_settings.load() or user_settings.from_env())
+
+
+@app.post("/api/settings")
+async def api_settings_save(body: dict):
+    _local_only()
+    async with _lock:
+        us = user_settings.save(body)
+    return user_settings.masked(us)
+
+
+@app.post("/api/settings/test")
+async def api_settings_test(body: dict):
+    _local_only()
+    async with _lock:
+        us = user_settings.save(body)  # save first so the test uses exactly what is on screen
+        result = await asyncio.to_thread(user_settings.test_connections, us)
+    return result
 
 
 @app.get("/healthz")

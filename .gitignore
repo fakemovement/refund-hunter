@@ -11,3 +11,5 @@ agentcore/aws-targets.json
 .DS_Store
 node_modules/
 build/
+agentcore/.cli/
+backend/.env.deployed

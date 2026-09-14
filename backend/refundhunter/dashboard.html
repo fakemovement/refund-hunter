@@ -43,6 +43,27 @@
   .spin{display:inline-block;width:12px;height:12px;border:2px solid #ccc;border-top-color:#333;border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px;margin-right:6px}
   @keyframes s{to{transform:rotate(360deg)}}
   @media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+  .banner{background:#e3ecfb;border:1px solid #c7d7f5;color:#1c3d7a;border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .banner a{color:var(--accent);font-weight:600;cursor:pointer}
+  dialog{border:none;border-radius:14px;padding:0;width:min(640px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  dialog::backdrop{background:rgba(0,0,0,.35)}
+  .modal{padding:22px 24px}
+  .modal h2{margin:0 0 4px;font-size:18px}
+  .modal .lead{color:var(--muted);font-size:13px;margin:0 0 16px}
+  fieldset{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+  legend{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 6px}
+  label{display:block;font-size:13px;margin:8px 0 4px}
+  input[type=text],input[type=password],input[type=email],input[type=number]{font:inherit;width:100%;padding:8px 10px;border:1px solid #d5d2cb;border-radius:8px;background:#fff}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .choice{display:flex;gap:8px;flex-wrap:wrap}
+  .choice label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;margin:0}
+  .choice input{margin:0}
+  .check{display:flex;align-items:center;gap:8px;font-size:13px;margin:8px 0 2px}
+  .help{font-size:12px;color:var(--muted);margin:4px 0 0}
+  .help a{color:var(--accent)}
+  .modal .actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px}
+  #testresult{font-size:13px;color:var(--muted)}
+  [hidden]{display:none !important}
 </style>
 </head>
 <body>
@@ -52,9 +73,83 @@
     <span id="status"></span>
     <button id="run" class="primary">Run today's check</button>
     <button id="reset" title="Wipe the demo state">Reset demo</button>
+    <button id="settings-btn" title="Connect your AI key and inbox">⚙ Settings</button>
   </div>
 </header>
+<dialog id="settings">
+  <form class="modal" id="settings-form" method="dialog">
+    <h2>Settings</h2>
+    <p class="lead">Everything here stays on this computer in a private file. Nothing is uploaded anywhere.</p>
+
+    <fieldset>
+      <legend>1. The AI that reads and decides</legend>
+      <div class="choice">
+        <label><input type="radio" name="model_provider" value="anthropic"> Anthropic API key</label>
+        <label><input type="radio" name="model_provider" value="bedrock"> AWS Bedrock (uses your AWS login)</label>
+      </div>
+      <div id="anthropic-fields">
+        <label>Anthropic API key</label>
+        <input type="password" name="anthropic_api_key" placeholder="sk-ant-…" autocomplete="off">
+        <p class="help">Get one at <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Pay as you go; one daily run costs a few cents.</p>
+      </div>
+      <div id="bedrock-fields">
+        <div class="two">
+          <div><label>AWS region</label><input type="text" name="aws_region" placeholder="us-east-1"></div>
+          <div><label>Bedrock model id</label><input type="text" name="bedrock_model_id" placeholder="global.anthropic.claude-sonnet-4-6"></div>
+        </div>
+        <p class="help">Needs AWS credentials on this computer (<code>aws configure</code>) with access to Claude on Bedrock.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Your inbox</legend>
+      <div class="choice">
+        <label><input type="radio" name="mail_source" value="fixtures"> Demo inbox (made-up receipts)</label>
+        <label><input type="radio" name="mail_source" value="imap"> My Gmail</label>
+      </div>
+      <div id="imap-fields">
+        <div class="two">
+          <div><label>Gmail address</label><input type="email" name="imap_user" placeholder="you@gmail.com" autocomplete="off"></div>
+          <div><label>App password</label><input type="password" name="imap_password" placeholder="16 letters" autocomplete="off"></div>
+        </div>
+        <p class="help">Not your normal password. In Google: Account → Security → 2-Step Verification on → <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">App passwords</a> → create one named "Refund Hunter". Refund Hunter only reads; it never deletes or moves mail.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. Sending claims</legend>
+      <label class="check"><input type="checkbox" name="send_emails"> Let the agent send claim emails from my Gmail (after I tap Yes)</label>
+      <label class="check"><input type="checkbox" name="safe_mode"> Safe mode: send every claim to <b>me</b> instead of the store, so I can read it first</label>
+      <p class="help">With sending off, claims are written but stay in "Emails the agent sent" for you to copy.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>4. You</legend>
+      <div class="two">
+        <div><label>Your name (signs the emails)</label><input type="text" name="owner_name"></div>
+        <div><label>Your email (reply address)</label><input type="email" name="owner_email"></div>
+      </div>
+      <div class="two">
+        <div><label>Follow up after (days)</label><input type="number" name="followup_after_days" min="1" max="30"></div>
+        <div><label>Ignore refunds under ($)</label><input type="number" name="min_claim_amount" min="0" step="0.5"></div>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <span id="testresult"></span>
+      <span class="row">
+        <button type="button" id="test-btn">Test connection</button>
+        <button type="button" id="cancel-btn">Cancel</button>
+        <button type="submit" class="primary">Save</button>
+      </span>
+    </div>
+  </form>
+</dialog>
 <main>
+  <div class="banner" id="banner" hidden>
+    <span>You're on the <b>demo inbox</b>. To hunt refunds in your own mail, add your AI key and Gmail in Settings.</span>
+    <a onclick="openSettings()">Open Settings →</a>
+  </div>
   <div class="tiles">
     <div class="tile"><div class="k">Money found</div><div class="v" id="t-found">$0</div></div>
     <div class="tile"><div class="k">Claims filed</div><div class="v" id="t-filed">$0</div></div>
@@ -101,6 +196,8 @@ async function load(){
   $('#owner').textContent = s.owner + ' · ' + (s.mode === 'agentcore' ? 'AgentCore runtime' : 'local agent') + ' · ' + (s.smtp ? 'email on' : 'dry-run outbox');
   // On the public demo the reset button is hidden unless the URL ends with #admin.
   $('#reset').hidden = (s.mode === 'agentcore' && location.hash !== '#admin');
+  $('#settings-btn').hidden = (s.mode === 'agentcore');
+  $('#banner').hidden = !(s.mode === 'local' && s.mail_source === 'fixtures' && !s.configured);
   if (s.running && !busy) { setBusy(true, 'The agent is running…'); waitForRun().then(m => { setBusy(false, m); load(); }); }
   $('#t-found').textContent = money(s.totals.found);
   $('#t-filed').textContent = money(s.totals.filed);
@@ -160,7 +257,48 @@ $('#run').onclick = async () => { if(busy) return; setBusy(true,'Reading mail an
 $('#reset').onclick = async () => { if(busy) return; if(!confirm('Wipe the demo state?')) return; await post('/api/reset'); setBusy(false,'Reset'); load(); };
 window.decide = async (id, answer) => { if(busy) return; setBusy(true, answer==='approve'?'Filing the claim…':'Skipping…'); try{ const r = await post('/api/decide',{interrupt_id:id, answer}); setBusy(false, r.summary||'Done'); }catch(e){ setBusy(false,'Error: '+e.message); } load(); };
 window.resolve = async (id, outcome) => { await post('/api/resolve',{claim_id:id, outcome}); load(); };
-load().then(() => { if (location.hash === '#open') document.querySelectorAll('details').forEach(d => d.open = true); });
+
+// ---- settings ---------------------------------------------------------------
+const form = $('#settings-form');
+function fillForm(d){
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    if (el.type === 'radio') el.checked = (d[el.name] === el.value);
+    else if (el.type === 'checkbox') el.checked = !!d[el.name];
+    else el.value = d[el.name] ?? '';
+  }
+  toggleFields();
+}
+function readForm(){
+  const d = {};
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    if (el.type === 'radio') { if (el.checked) d[el.name] = el.value; }
+    else if (el.type === 'checkbox') d[el.name] = el.checked;
+    else if (el.type === 'number') d[el.name] = Number(el.value);
+    else d[el.name] = el.value;
+  }
+  return d;
+}
+function toggleFields(){
+  const d = readForm();
+  $('#anthropic-fields').hidden = d.model_provider !== 'anthropic';
+  $('#bedrock-fields').hidden = d.model_provider !== 'bedrock';
+  $('#imap-fields').hidden = d.mail_source !== 'imap';
+}
+form.addEventListener('change', toggleFields);
+window.openSettings = async () => {
+  try { const d = await (await fetch('/api/settings')).json(); fillForm(d); $('#testresult').textContent = ''; $('#settings').showModal(); }
+  catch(e){ alert('Settings are only available when you run Refund Hunter on your own computer.'); }
+};
+$('#settings-btn').onclick = openSettings;
+$('#cancel-btn').onclick = () => $('#settings').close();
+form.addEventListener('submit', async (ev) => { ev.preventDefault(); try { await post('/api/settings', readForm()); $('#settings').close(); setBusy(false, 'Settings saved'); load(); } catch(e){ $('#testresult').textContent = 'Could not save: ' + e.message; } });
+$('#test-btn').onclick = async () => { $('#test-btn').disabled = true; $('#testresult').textContent = 'Testing… (10–20 s)'; try { const r = await post('/api/settings/test', readForm()); $('#testresult').textContent = 'Inbox: ' + r.inbox + ' · AI: ' + r.model; } catch(e){ $('#testresult').textContent = 'Test failed: ' + e.message; } $('#test-btn').disabled = false; };
+load().then(() => {
+  if (location.hash === '#open') document.querySelectorAll('details').forEach(d => d.open = true);
+  if (location.hash === '#settings') openSettings();
+});
 </script>
 </body>
 </html>

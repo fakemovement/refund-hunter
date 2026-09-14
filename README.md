@@ -72,25 +72,44 @@ inbox ──► Receipt Reader ──► purchases ──► Hunter ──► cl
 | Observability | CloudWatch logs, AgentCore traces |
 | Dashboard | FastAPI + one HTML page (`refundhunter serve`), local or pointing at the runtime; the public demo runs it on **AWS Lambda** with a function URL (`infra/deploy_web.py`) |
 
-## Quick start (five minutes, no accounts needed)
+## Run it yourself (five minutes)
+
+You need Python 3.12 and [uv](https://docs.astral.sh/uv/). Then:
 
 ```bash
-cd backend
+git clone https://github.com/fakemovement/refund-hunter.git
+cd refund-hunter/backend
 uv venv .venv --python 3.12
 uv pip install -e ".[dev]" "strands-agents[anthropic]"
-cp .env.example .env                 # defaults: Bedrock via your AWS credentials, fixture inbox, dry-run outbox
-.venv/Scripts/refundhunter run       # read the demo inbox, hunt, pause on the first claims
-.venv/Scripts/refundhunter decisions # see what it wants to ask you
-.venv/Scripts/refundhunter decide <interrupt id> approve
-.venv/Scripts/refundhunter serve     # dashboard at http://127.0.0.1:8000
+.venv/Scripts/refundhunter serve        # Windows;  macOS/Linux: .venv/bin/refundhunter serve
 ```
 
-No AWS credentials? Set `RH_MODEL_PROVIDER=anthropic` and `ANTHROPIC_API_KEY`.
+Open **http://127.0.0.1:8000** and click **⚙ Settings**. The form asks for four things:
 
-**Real inbox.** Create a Gmail App Password and set `RH_MAIL_SOURCE=imap`, `RH_IMAP_USER`,
-`RH_IMAP_PASSWORD`. To let it send real claim emails set `RH_SMTP_USER` / `RH_SMTP_PASSWORD`; set
-`RH_CLAIMS_TO_OVERRIDE=you@example.com` while testing so every claim lands in your own inbox
-instead of a store's.
+1. **The AI.** Paste an Anthropic API key, or pick AWS Bedrock if you have AWS credentials with
+   Claude access on this machine.
+2. **Your inbox.** Keep the demo inbox to try it, or choose *My Gmail* and enter your address and a
+   Gmail [App Password](https://myaccount.google.com/apppasswords) (2-Step Verification must be on).
+   Refund Hunter only reads mail; it never deletes or moves anything.
+3. **Sending.** Off by default: claims are written but stay on the dashboard for you to copy. Turn
+   it on to send from your Gmail after you tap Yes. *Safe mode* sends every claim to you instead of
+   the store, so you can read them first.
+4. **You.** Your name and reply address for the emails, how many quiet days before a follow-up,
+   and the smallest refund worth asking for.
+
+Press **Test connection** to check the inbox login and the AI in one go, then **Save**. Settings are
+stored in `backend/.data/settings.json`, which is git-ignored and never leaves your computer.
+
+Prefer environment variables? Copy `.env.example` to `.env`; the dashboard settings override it.
+
+Command line, if you like it:
+
+```bash
+refundhunter run          # today's check
+refundhunter decisions    # what is waiting for you
+refundhunter decide <interrupt id> approve
+refundhunter reset        # wipe the demo state
+```
 
 ## Demo data
 
